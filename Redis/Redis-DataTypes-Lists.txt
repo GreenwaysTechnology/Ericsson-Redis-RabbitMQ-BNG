@@ -1,0 +1,144 @@
+Redis-Lists
+
+	From a very general point of view a List is just a sequence of ordered elements: 10,20,1,2,3 is a list. 
+
+ 	But the properties of a List implemented using an Array are very different from the properties of a List implemented using a Linked List.
+
+	Redis lists are implemented via Linked Lists.
+This means that even if you have millions of elements inside a list, the operation of adding a new element in the head or in the tail of the list is performed in constant time. 
+
+ 	The speed of adding a new element with the LPUSH command to the head of a list with ten elements is the same as adding an element to the head of list with 10 million elements.
+
+	What's the downside? Accessing an element by index is very fast in lists implemented with an Array (constant time indexed access) and not so fast in lists implemented by linked lists (where the operation requires an amount of work proportional to the index of the accessed element).
+	Redis Lists are implemented with linked lists because for a database system it is crucial to be able to add elements to a very long list in a very fast way.
+
+Another strong advantage, as you'll see in a moment, is that Redis Lists can be taken at constant length in constant time.
+
+	When fast access to the middle of a large collection of elements is important, there is a different data structure that can be used, called sorted sets. Sorted sets will be covered later in this tutorial.
+
+..........................................................................................
+
+List Operations:
+
+Adding elements
+
+1.adding element at head.
+
+ LPUSH names subu shrisha subramanian geetha
+
+2.Printing list 
+
+  LRANGE names 0 100
+
+
+3.Adding element at head if key exists
+  lpushx
+
+ steps:
+   lpush counters 1 2 3
+   lpushx counters 4
+
+Note: if you add element using lpushx without existing key,it will not add any element
+      
+
+4.Adding element at tail even though key does not exists
+
+ rpush names ram krish
+
+5.Adding element at tail only if key exits
+  rpushx counters 10
+
+
+6.Insert/add element before an element
+
+LINSERT key BEFORE|AFTER pivot element
+
+redis> RPUSH mylist "Hello"
+(integer) 1
+redis> RPUSH mylist "World"
+(integer) 2
+redis> LINSERT mylist BEFORE "World" "There"
+(integer) 3
+redis> LRANGE mylist 0 -1
+1) "Hello"
+2) "There"
+3) "World"
+redis> 
+............................................................................................
+Update items in the middle of the list:
+......................................
+
+lset key index value
+
+lset counters 4 100.
+...........................................................................................
+Removing elements:
+
+1.Remove elements at top
+
+>LPOP key
+
+2.Remove elements at bottom.
+>RPOP key
+
+3.Remove last and add first
+
+RPOPLPUSH source destination
+   Atomically returns and removes the last element (tail) of the list stored at source, and pushes the element at the first element (head) of the list stored at destination.
+
+   For example: consider source holding the list a,b,c, and destination holding the list x,y,z. Executing RPOPLPUSH results in source holding a,b and destination holding c,x,y,z.
+
+  If source does not exist, the value nil is returned and no operation is performed. If source and destination are the same, the operation is equivalent to removing the last element from the list and pushing it as first element of the list, so it can be considered as a list rotation command.
+
+>rpoplpush mylist myanotherlist
+
+ Remove bottom elements from mylist and add element in the myanotherlist at top.
+
+
+4.Remove n of element
+
+LREM key count element
+
+redis> RPUSH mylist "hello"
+(integer) 1
+redis> RPUSH mylist "hello"
+(integer) 2
+redis> RPUSH mylist "foo"
+(integer) 3
+redis> RPUSH mylist "hello"
+(integer) 4
+redis> LREM mylist -2 "hello"
+(integer) 2
+redis> LRANGE mylist 0 -1
+1) "hello"
+2) "foo"
+
+
+
+5.BRPOPLPUSH source destination timeout
+
+Pops a value from a list, pushes it to another list and returns it; or blocks until one is available
+
+ BRPOPLPUSH list1 list2 10
+
+6.BLPOP key1 [key2 ] timeout
+Removes and gets the first element in a list, or blocks until one is available
+
+7.BRPOP key1 [key2 ] timeout
+Removes and gets the last element in a list, or blocks until one is available
+
+
+........................................................................................
+
+Return the element based on index:
+..................................
+
+LINDEX key index
+>lindex mylist 0
+
+Return the total length of the list
+
+llen mylist
+
+
+

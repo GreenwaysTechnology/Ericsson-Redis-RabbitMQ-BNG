@@ -1,0 +1,569 @@
+ RabbitMQ:
+
+ What is RabbitMQ?
+
+ It is one of the Messaging Software.
+
+Distributed Architechture?
+
+ Breaking application into separate components and keep
+each component in isloation,those communicate each other 
+in order to exchange data. - Distributed application.
+
+Layers 
+  Front end 
+  Biz layer
+  data layer
+Technlogy could be single technology.
+   ->java,C#,
+
+if you want to integrate the application with third parties.
+(External system).
+  connector architecture.
+
+java : JMS
+
+
+Use cases of Distributed modeling:
+
+class Rule{
+
+   private RuleConsumer consumer;
+  
+    Rule(){}
+    Rule(RuleConsumer consumer){
+       this.consumer= consumer
+    }
+
+
+  public void send(String ticket){
+      consumer.consume(data)
+  }
+
+}
+
+
+class RuleConsumer{
+
+  public void consume(String data){
+           sys(data);
+  }
+
+}
+
+RuleConsumer consumer=new RuleConsumer();
+Rule rule = new Rule(consumer);
+
+rule.send('Ticket1');
+
+Object Communication(Program Commuincation):
+............................................
+
+Sync Programming
+Async Programming.
+
+..................................................................
+
+
+
+Message oriented Middlewares:
+.............................
+
+	Message-oriented middleware (MOM) is software or hardware infrastructure supporting sending and receiving messages between distributed systems. 
+
+	MOM allows application modules to be distributed over heterogeneous platforms and reduces the complexity of developing applications that span multiple operating systems and network protocols. 
+
+ 	The middleware creates a distributed communications layer that insulates the application developer from the details of the various operating systems and network interfaces. 
+	APIs that extend across diverse platforms and networks are typically provided by MOM.
+
+       This middleware layer allows software components (applications, Enterprise JavaBeans, servlets, and other components) that have been developed independently and that run on different networked platforms to interact with one another.
+
+
+Middleware categories
+......................
+
+1.Remote Procedure Call or RPC-based middleware
+2.Object Request Broker or ORB-based middleware
+3.Message Oriented Middleware or MOM-based middleware
+
+
+"In an RPC- or ORB-based system, when one procedure calls another, it must wait for the called procedure to return before it can do anything else"
+
+
+ "In these synchronous messaging models, the middleware functions partly as a super-linker, locating the called procedure on a network and using network services to pass function or method parameters to the procedure and then to return results".
+
+MOM :
+
+AMQP:
+
+ AMQP is the Internet Protocol for Business Messaging.
+
+Protocal :
+ set of rules for to transmit data across  machines and system.
+
+Protocal is software or hardware.
+ Protocal is program, written in either c / c++.
+
+Since Protcol is program, amqp is also program written in c language.
+
+features:
+
+1.Security
+2.Reliability
+3.Interoperability
+4.Standard
+5.Open
+
+////////////////////////////////////////////////////////////////////////////////////
+
+AMQP Components:
+
+
+Publisher ----------------> Server----VHOST---Exchange---Queue---Consumer
+..................................................................................
+What is RabbitMQ?
+
+ RabbitMq is programm written in erlang which implements AMQP Spec.
+
+ RabbitMQ is application which is running on erlang runtime.
+
+////////////////////////////////////////////////////////////////////////////////////////////
+
+Rabbit MQ Installation:
+.......................
+
+
+OS : ubuntu
+
+if you want to change host name
+
+$sudo gedit /etc/hostname
+
+reboot machine
+
+$sudo reboot
+
+notepad.pw/rabbitsubu
+
+instllation steps:
+
+Run the following scripts
+
+
+#!/bin/sh
+
+## If sudo is not available on the system,
+## uncomment the line below to install it
+# apt-get install -y sudo
+a
+
+## Install prerequisites
+sudo apt-get install curl gnupg -y
+
+## Install RabbitMQ signing key
+curl -fsSL https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc | sudo apt-key add -
+
+## Install apt HTTPS transport
+sudo apt-get install apt-transport-https
+
+## Add Bintray repositories that provision latest RabbitMQ and Erlang 21.x releases
+sudo tee /etc/apt/sources.list.d/bintray.rabbitmq.list <<EOF
+## Installs the latest Erlang 22.x release.
+## Change component to "erlang-21.x" to install the latest 21.x version.
+## "bionic" as distribution name should work for any later Ubuntu or Debian release.
+## See the release to distribution mapping table in RabbitMQ doc guides to learn more.
+deb https://dl.bintray.com/rabbitmq-erlang/debian bionic erlang
+deb https://dl.bintray.com/rabbitmq/debian bionic main
+EOF
+
+## Update package indices
+sudo apt-get update -y
+
+## Install rabbitmq-server and its dependencies
+sudo apt-get install rabbitmq-server -y --fix-missing
+
+............................................................................................
+
+Test Server running status:
+
+$sudo service rabbitmq-server status
+
+Starting ,stopping,restarting rabbitmq process
+
+
+os command
+$sudo service rabbitmq-server stop
+
+$sudo service rabbitmq-server start
+
+$sudo service rabbitmq-server restart
+
+rabbitmq provides tool:
+
+$rabbitmqctl status
+ will print node informaiton
+
+$rabbitmqctl stop
+  will stop app and shutdown the process
+
+$rabbitmqctl stop_app
+  will stop the application(vhost)
+$rabbitmqctl start_app
+  will restart/redeploy vhost application
+
+
+RabbitMQ Server Startup process?
+
+ Rabbit MQ server is started as demone process by default once rabbitmqserver installed.
+
+  ->$ sudo service rabbitmq-server start -d (detached)
+
+Can i run default server without -d option
+
+How to start the (default server) in interactive mode?
+
+ $sudo rabbitmq-server
+How rabbit-MQ Server starts?
+
+Default Work Flow:
+
+if you enter this script in the shell
+
+$sudo rabbitmq-server
+
+ Rabbitmq starts searching the file from "/etc/rabbitmq/rabbitmq-env.conf" 
+ |
+   It reads the environment settings for basic rabbitmq server details
+
+
+ The above one starts a node with default settings.
+	"Once rabbitmq is installed, rabbitq server is installed as single node with name 
+	"rabbit"  and default port is 5672 and log files are generatd in in the locaiton
+	/var/log/rabbitmq"
+
+
+Types of config
+
+ Note:
+  dont confuse with rabbitmq-env.conf with rabbit.conf and advanced.config files 
+
+RabbitMQ can be configured in many ways
+
+1.config files
+2.environment variables
+3.rabbitmqctl
+4.pluggins
+5.erlang runtime parameters
+6.parameters and policies
+
+
+
+1.config files:
+
+category of config files
+
+1.env config
+  
+  ->rabbit-env.conf
+  
+  
+2.server settings
+  rabbitmq.conf
+  rabbitmq.advanced.conf
+
+config File location;
+.....................
+
+/etc/rabbitmq/
+
+Default node name is "rabbit@hostName"
+
+how to change node change?/ how to create new server with different node name?
+
+Two ways:
+
+1.through rabbitmq-env.conf file : static
+
+2.through env variables : 
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+Administration can be done in many ways
+
+1.config files 
+   one time, for each node, common settings for more no of nodes on single host.
+  env,config,advanced
+2.rabbitmqctl : command line tool
+3.web interace/application
+  rabbitmq server offers an application which is used to monitor,administor rabbitmq
+4.REST API.
+
+
+Commandline tools for adminsitring and configuring rabbitmq server:
+
+1.rabbitmqctl
+ for service management and general operator tasks
+2.rabbitmq-diagnostics
+
+3.rabbitmq-plugins:
+ are utilities which extend the functionality of rabbitmq server with various features
+ when y install rabbitmq server, all plugins are installed but not activated.
+ plugins are programs written in erlang.
+
+plugins category:
+
+1.managment_plugin:
+
+ Managment plugin is for administring rabbitmq-server in web mode.
+
+Points:
+1.only one web application(management application can present per host).
+  even though if you have more rabbit nodes.
+ All nodes share the same plugins.
+
+if we start more nodes on single host , then how to monitor all host in single management app.
+
+ -It should be in cluster.
+
+2.if you are starting multiple node on single host. dont enable management_plugin while node start up, if you do, it will error report "Node crash".
+ what if managment plugin is running, then you have to disable it before starting node.
+
+  $sudo rabbitmq-plugins disable managment_plugin
+
+After starting all nodes,
+  and again enable it
+
+ $sudo rabbitmq-plugins enable manangment_plugin
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+How to start rabbitmq server across the Host(vms):
+
+
+From server-1
+$stop_app on rabbit-server2
+$reset on rabbit-server2
+$start_app rabbit-server2
+$rabbitmqctl rabbit@server1 join_cluster @rabbit@server-2
+////////////////////////////////////////////////////////////////////////////////////////////
+
+sudo RABBITMQ_NODENAME=node01 RABBITMQ_NODE_PORT=5673 RABBITMQ_SERVER_START_ARGS="-rabbitmq_management listener [{port,15673}]" rabbitmq-server -detached
+
+rabbitmqctl -n node01 stop_app
+rabbitmqctl -n node01 join_cluster rabbit@$HOSTNAME
+rabbitmqctl -n node01 start_app
+
+
+Break the cluster:
+
+rabbitmqctl -n node01 stop_app
+rabbitmqctl -n node01 reset
+rabbitmqctl -n node01 start_app
+
+.........................................................................................
+
+High Availability:
+ Whilst RabbitMQ  supports clustering, clustering is intended to facilitate scalability, not availability. Thus in a cluster, if a node fails, queues which were on the failed node are lost. With the high availability setup described in this guide, when a node fails, the durable queues and the persistent messages within them can be recovered by a different node
+
+
+Why?
+RabbitMQ approaches the issue of high availability by replicating data, the same as storage solutions (think of the RAID solutions), databases, and all the IT infrastructures when data integrity and service continuity are of primary importance.
+
+In fact, the objective of these kinds of solutions is not only to avoid the possibility of data loss but also to avoid any downtime due to both scheduled maintenance and system malfunctions
+
+
+Mirroring queues:
+
+Lab :
+
+Requirement:
+
+1.You must have a cluster.
+
+
+Starting:
+
+In order to configure a mirror queue, there are two ways that can be used; that is, it can be
+configured using rabbitmqctl or using the web management plugin
+
+1.setup cluster, within host or across vms.
+
+
+2. Configure the policies via web management by navigating to Admin | Policies | Add
+/ update a policy.
+
+3. Enter mirror-all to the Name field, ^mirr\. to the Pattern field, and ha-mode
+and all to the Definition field
+  
+
+4. Click on Add policy.
+
+please refer:mirror-lab1.jpg
+
+
+5.Create a queue named mirr.q_connection_1_1. (It's important that the prefix is
+mirr.; you are free to call the queue as you prefer.)
+
+
+Refer Mirroring in the management :mirror-lab2.png
+
+The mirror-all parameter is the policy name, and the ^mirr\. string is the regular
+expression pattern. We are instructing RabbitMQ to mirror all the queues that have names
+starting with mirr..
+
+The last parameter is the mirroring mode. With ha-mode:all, the queues are mirrored
+across all the nodes in the cluster using a master slave pattern (the slaves can be more than
+one). Whenever a queue matches the given pattern is created on one node, it is replicated on
+all the others, and whenever a client starts inserting messages in it, they are replicated across all the slaves.
+
+..............................***********.....................................................
+
+Distributing messages between a couple of brokers:
+..................................................
+
+The ha-mirror plugin requires a cluster.
+
+In order to replicate messages across the WAN, you can use the federation plugin. This plugin
+does not require a cluster, so you can federate more RabbitMQ instances over a WAN even
+with different Erlang versions.
+
+
+
+Two machines
+
+1.chennaiserver
+10.0.2.9
+2.banagloreserver
+10.0.2.16
+
+
+Upstream Server : Chennai Server
+downstream Server : Banaglore Server
+
+
+The federation plugin must be enabled; it's disabled by default. For both the machines,
+perform the following steps:
+
+1. Enable the plugin using the following command:
+
+ rabbitmq-plugins enable rabbitmq_federation
+
+2. Enable the plugin for the web management console using the following command:
+
+ rabbitmq-plugins enable rabbitmq_federation_management
+
+
+3. Restart RabbitMQ and check the plugin using rabbitmqctlstatus, as you can see
+in the following screenshot:
+
+For rabbitmqc1 machine, perform the following steps:
+
+4. It's also possible to check the status on the web management. On selecting the
+Admin tab, you can see the Federation Status and Federation Upstreams entries on
+the right, as shown in the following screenshot:
+
+Federation-admin.jpg
+
+
+
+
+Note: 
+
+In the DownStream server -banaglore-server
+ 
+we cant use / vhost and guest user account
+
+so
+
+1.Add new vhost
+ /bnghost
+2.create new user
+ subu
+ subugee
+ management
+3.set permissions for subu and on bnghost and /
+
+
+Go to chennai server
+....................
+
+1.Configure the federation upstreams. Open the web management console by
+navigating to Admin | Federation Upstreams | Add a new upstream, and then fill
+the following fields:
+
+ Name: first_upstream
+ URI: amqp://subu:subugee@banaglore-server/bnghost
+
+2.For the Chennaiserver machine, configure the federation policy. Open the web
+management console and navigate to Admin | Policies | Add / update a policy, and
+fill the following fields:
+ Name: fed_policy
+ Pattern: ^fed\.
+ Definition: federation-upstream-set:all
+
+3.For the Chennaiserver machine, add a new exchange with the prefix fed., for example
+fed.myfanoutexchange
+
+4.For the chennaiserver machine, check the upstream status from the web
+management console by navigating to Admin | Federation Status and if everything is
+fine, you should have the following screenshot
+.........................................................................................
+
+How to communicate rabbitmq broker?
+
+There are two programs
+
+1.publisher/sender/producer
+2.consumer/receiver/subscriber
+
+
+Languages:
+
+Java 
+
+ Plain java
+ Spring amqp lib
+
+ Erlang
+
+ .net
+ Python
+ Ruby
+ Php
+ Go
+ Swift
+ Objective C
+ java script
+    node.js
+
+
+
+Step:
+
+connection : which talks tcp connection(socket connection)
+channel:Where you are going to send message.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

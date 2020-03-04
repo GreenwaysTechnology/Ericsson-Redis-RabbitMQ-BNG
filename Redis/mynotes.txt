@@ -1,0 +1,146 @@
+Redis is NoSQL data base
+
+Types of NoSql database
+- Key-Value
+- Document 
+- Column Family
+- Graph 
+
+
+Key-Value
+
+With a key/value storage format, data uses keys, which are identifiers
+that are similar to a primary key in a relational database. The
+data element itself is then the value that corresponds to the key.
+An example of a key/value pair looks like this:
+"id": 12319054
+
+Column
+With a column-oriented data store, data is arranged by column
+rather than by row. The effect of this architectural design is that it
+makes aggregate queries over large amounts of data much faster
+to process.
+
+Document
+Document data storage in NoSQL uses a key as the basis for
+item retrieval. The key then corresponds to a more complex data
+structure,
+called a document, which contains the data elements for
+a given collection of data.
+
+
+Graph
+Graph databases use graph theory to store data relations in a
+series of vertices with edges, making queries that work with data
+in such a manner much faster.
+
+Seeing Where Redis Fits
+
+Redis is a NoSQL database and yet much more
+
+"Redis is a multimodel
+database enabling search, messaging, streaming, graph,
+and other capabilities beyond that of a simple data store"
+
+
+Multi-model databases
+
+Multi-model databases provide a way to interact with data
+regardless of its underlying data model.
+Redis provides full multi-model functionality through Redis Modules.
+The use of Redis as a multi-model database enables greater
+flexibility for application developers within an organization.
+
+Data storage
+	Redis keeps data in memory for fast access and persists data to
+storage, as well as replication of in-memory contents for high availability
+production scenarios.
+
+	When discussing data storage, the concept of durability becomes
+important. Durability is the ability to ensure that data is available
+in the event of a failure of a database component.
+
+	Redis supports multiple modes for ensuring durability, accommodating
+most data structures and environment-specific requirements
+
+.........................................................................................
+
+Database,memory,persistency layout:
+
+There is no formal database creation step with Redis. Like database
+creation, there isn’t a formal table creation step necessary
+with Redis either.
+
+The SET command is used to create data within
+the current database.
+
+Data is stored in random access memory (RAM) on the Redis server.
+This means that as data is added, additional RAM is used. Redis on
+Flash provides a method for supplementing RAM
+with flash-based memory
+
+Does redis writes data to disk and why?
+
+Yes,For Durability
+
+Redis writes the contents of the database
+to disk at varying (and configurable) intervals depending on
+the amount of data that changes during the interval.
+
+Durability:
+
+Persisting data to disk ensures durability in the event of a software or hardware
+failure that renders the server unavailable
+
+Other means for providing durability, such as clustering for high availability, are
+common with Redis in a production environment.
+
+Redis comman use case
+
+»»Session Management
+»»Intelligent caching
+»»Pub/sub pattern for incoming data
+»»Job and queue management
+»»Built-in analytics
+»»Native JSON-handling
+
+Redis Modules
+»»Redis Graph,Search
+
+Redis databases are inmemory by default it has 16 dbs
+
+deault db is 0
+
+change database 
+ select 1
+
+
+Data Structure:
+»»Strings
+»»Lists
+»»Sets
+»»Sorted sets
+»»Hashes
+»»Bit arrays
+»»Streams
+»»HyperLogLogs
+
+
+Redis lua script execution:https://www.redisgreen.net/blog/intro-to-lua-for-redis-programmers/
+
+>mkdir myscripts
+
+myscripts>
+hello.lua
+local message="Hello"
+return message
+
+..
+How to run
+$ ./redis-cli   --eval ./myscripts/hello.lua
+
+
+
+
+
+

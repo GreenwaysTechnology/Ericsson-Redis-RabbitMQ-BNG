@@ -1,0 +1,599 @@
+Redis Session Agenda:
+.....................
+
+https://www.slideshare.net/itamarhaber/redis-use-patterns-devcontlv-june-2014
+
+What is Redis?
+
+ "Redis is an open source (BSD licensed), in-memory data structure store, used as a database, cache and message broker".
+
+ Redis is NOSQL Database.
+
+What is NOSQL? - ->Refer the other notes.
+
+Types of NOSQL ?
+
+1.Wide Column Store / Column Families
+2.Document Store
+3.Key Value / Tuple Store 
+4,Graph Database Management Systems
+5.Multimodel Database Management Systems
+
+.....................................*******............................................
+
+Why Redis?
+
+->Data Structure store
+->Supports rich data types
+->Redis has built in replication
+->Lua Scripting
+->LRU Evcition-Least recently used
+->Transactions
+->High availbility via redis sentinal and Automatic partioning with Redis cluster.
+
+
+Redis Deep Understanding?
+
+What is it?
+ Redis is often referred as a data structures server. What this means is that Redis provides access to mutable data structures via a set of commands, which are sent using a server-client model with TCP sockets and a simple protocol. So different processes can query and modify the same data structures in a shared way.
+
+
+History:
+
+->Redis stands for REmote DIctionary Server.
+->It was written in C by Salvatore Sanfilippo in 2006 and currently has many contributors.
+->There are Redis clients available for over 30 programming languages
+
+
+->Redis is a NoSQL (Not only SQL) advanced key-value data store.
+
+->Redis offers a number of features that are natural to find in a database, like replication, tunable levels of durability, cluster, high availability.
+
+->Another good example is to think of Redis as a more complex version of memcached, where the operations are not just SETs and GETs, but operations to work with complex data types like Lists, Sets, ordered data structures, and so forth.
+
+
+
+->It is also referred to as a data structure server because of its powerful data types, such as Strings, Hashes, Lists, Sets, Sorted Sets, Bitmaps, and HyperLogLogs.
+->By default, Redis saves all data in the memory, therefore read and write operations are very fast
+->It can  persist data in the disk at regular intervals :Persistency.
+   "Data persistence in Redis can be achieved by creating a binary snapshot of the stored data or a human-readable file with a sequence of all executed commands over time".
+    "These are respectively known as snapshotting and journaling".
+
+............................................................................................
+
+RDBMS Support SQL a language to communicate database.
+
+In Redis,we can use set of commands to communicate database.
+
+In Redis, we write and read data to and from the RAM not disk,so it is fast.
+
+Redis uses a client utility called redis-cli , is program used to send commands over tcp network.
+
+Basic commands:
+
+1.write operations
+  set command
+2.read operations
+  get command.
+
+Basic syntax:
+  Set key value options
+  Get key
+
+Lab 1 :
+
+Start redis-server
+Start redis-cli
+
+$redis-server
+
+
+$redis-cli
+>
+
+set name Subramanian
+
+get name 
+
+Lab 2 :
+
+Redis can be connected with many languages
+->java,c#,javascript......
+
+Demo with javascript:
+
+>npm install ioredis
+
+new Redis(); // Connect to 127.0.0.1:6379
+new Redis(6380); // 127.0.0.1:6380
+new Redis(6379, "192.168.1.1"); // 192.168.1.1:6379
+new Redis("/tmp/redis.sock");
+new Redis({
+  port: 6379, // Redis port
+  host: "127.0.0.1", // Redis host
+  family: 4, // 4 (IPv4) or 6 (IPv6)
+  password: "auth",
+  db: 0
+});
+
+new Redis(); // Connect to 127.0.0.1:6379
+new Redis(6380); // 127.0.0.1:6380
+new Redis(6379, "192.168.1.1"); // 192.168.1.1:6379
+new Redis("/tmp/redis.sock");
+new Redis({
+  port: 6379, // Redis port
+  host: "127.0.0.1", // Redis host
+  family: 4, // 4 (IPv4) or 6 (IPv6)
+  password: "auth",
+  db: 0
+});
+
+eg:
+const Redis = require('ioredis');
+
+const redis = new Redis();
+
+redis.set("newmessage","Hello Redis world").then(r=>console.log(r));
+redis.get("newmessage",function(err,result){
+  if(err) throw err;
+    console.log(result);
+});
+
+redis.quit()
+
+
+Lab 2 : with redis lib
+
+const redis = require('redis')
+
+const client = redis.createClient();
+
+client.set("message","HelloWorld",redis.print);
+client.get("message",function(err,result){
+ if(err) throw err;
+      console.log(result);
+  });console.log(msg);
+client.quit();
+
+..............................................**********....................................
+
+Data Types:
+
+1.Strings;
+
+ 	Strings are the most versatile data types in Redis because they have many commands
+and multiple purposes 
+
+	A String can behave as an integer, float, text string, or bitmap
+based on its value and the commands used. It can store any kind of data: text (XML,
+JSON, HTML, or raw text), integers, floats, or binary data (videos, images, or audio
+files).
+
+     A String value cannot exceed 512 MB of text or binary data.
+
+Refer : Strings-Notes
+
+Use case:
+ 1.hello.js
+
+
+var redis = require("redis"); // 1
+var client = redis.createClient(); // 2
+client.set("my_key", "Hello World using Node.js and Redis"); // 3
+client.get("my_key", redis.print); // 4
+client.quit(); // 5
+
+1. Require the redis library in Node.js. This is equivalent to import in
+Go, Python, or Java.
+2. Create the Redis client object.
+3. Execute the Redis command SET to save a String in a key called my_key.
+4. Execute the Redis command GET to get the value stored in my_key,
+and then output it.
+5. Close the connection with the Redis server.
+
+2.Use case 2 : Building Voting System using increment and decrement : integer operations
+
+This section builds a set of Node.js functions used to upvote and downvote articles.
+The idea is that there is a set of articles, and users can define their popularity by
+voting up or down.
+
+
+steps:
+
+>redis-cli
+
+Execute these commands:
+
+127.0.0.1:6379> SET article:12345:headline "Google Wants to Turn Your Clothes
+Into a Computer"
+OK
+127.0.0.1:6379> SET article:10001:headline "For Millennials, the End of the TV
+Viewing Party"
+OK
+127.0.0.1:6379> SET article:60056:headline "Alicia Vikander, Who Portrayed
+Denmark's Queen, Is Screen Royalty"
+OK
+
+articles-popularity.js
+
+1. Require the redis library in Node.js. This is equivalent to import in
+other languages.
+2. Create a Redis client instance.
+3. Create an upVote function that has the article ID as the argument.
+4. Define your key name using the article:<id>:votes structure.
+5. Use the INCR command to increment the number of votes by 1.
+
+var redis = require("redis"); // 1
+var client = redis.createClient(); // 2
+
+function upVote(id) { // 3
+  var key = "article:" + id + ":votes"; // 4 
+  client.incr(key); // 5
+}
+
+function downVote(id) { // 1
+  var key = "article:" + id + ":votes"; // 2 
+  client.decr(key); // 3
+}
+
+function showResults(id) {
+  var headlineKey = "article:" + id + ":headline";
+  var voteKey = "article:" + id + ":votes"; 
+  client.mget([headlineKey, voteKey], function(err, replies) { // 1
+    console.log('The article "' + replies[0] + '" has', replies[1], 'votes'); // 2
+  }); 
+}
+
+upVote(12345); // article:12345 has 1 vote
+upVote(12345); // article:12345 has 2 votes
+upVote(12345); // article:12345 has 3 votes
+upVote(10001); // article:10001 has 1 vote
+upVote(10001); // article:10001 has 2 votes
+downVote(10001); // article:10001 has 1 vote
+upVote(60056); // article:60056 has 1 vote
+showResults(12345);
+showResults(10001);
+showResults(60056);
+client.quit();
+
+
+List:
+
+->Lists are a very flexible data type in Redis because they can act like a simple
+collection, stack, or queue.
+
+->Many event systems use Redis's Lists as their queue because Lists' operations ensure that concurrent systems will not overlap popping items from a queue—List commands are atomic.
+
+->There are blocking commands in Redis's Lists, which means that when a client executes a blocking command in an empty List, the client will wait for a new item to be added to the List.
+
+->Redis's Lists are linked lists, therefore insertions and deletions from the beginning or the endof a List run in O(1), constant time.
+
+->The task of accessing an element in a List runs in O(N), linear time, but accessing
+the first or last element always runs in constant time
+
+->The maximum number of elements a List can hold is 232-1, which means there can
+be more than 4 billion elements per List.
+
+Some real-world use cases of Lists are as follows:
+• Event queue: Lists are used in many tools, including Resque, Celery,
+and Logstash
+• Storing most recent user posts: Twitter does this by storing the latest tweets
+of a user in a List
+
+->Refer List cli docs
+
+
+Use case : Queue
+
+queue.js
+function Queue(queueName, redisClient) { // 1 
+  this.queueName = queueName; // 2 
+  this.redisClient = redisClient; // 3 
+  this.queueKey = 'queues:' + queueName; // 4 
+  // zero means no timeout 
+  this.timeout = 0; // 5 
+}
+
+Queue.prototype.size = function(callback) { // 1 
+  this.redisClient.llen(this.queueKey, callback); // 2
+};
+
+
+Queue.prototype.push = function(data) { // 1 
+  this.redisClient.lpush(this.queueKey, data); // 2
+};
+
+Queue.prototype.pop = function(callback) { // 1 
+  this.redisClient.brpop(this.queueKey, this.timeout, callback); // 2
+};
+
+exports.Queue = Queue; // 
+
+
+producer.worker.js
+var redis = require("redis");
+var client = redis.createClient();
+var queue = require("./queue"); // 1
+var logsQueue = new queue.Queue("logs", client); // 2 
+var MAX = 5;
+for (var i = 0 ; i < MAX ; i++) { // 3
+  logsQueue.push("Hello world #" + i); // 4 
+}
+console.log("Created " + MAX + " logs"); // 5 
+client.quit();
+
+consumer-worker.js
+
+var redis = require("redis");
+var client = redis.createClient();
+var queue = require("./queue"); // 1
+var logsQueue = new queue.Queue("logs", client); // 2
+
+function logMessages() { // 3 
+  logsQueue.pop(function(err, replies) { // 4
+    var queueName = replies[0];
+    var message = replies[1];
+    console.log("[consumer] Got log: " + message); // 5
+    logsQueue.size(function(err, size) { // 6 
+      console.log(size + " logs left");
+    });
+    logMessages(); // 7 
+  });
+}
+logMessages(); // 8
+
+
+>node producer-woker.js
+
+>node consumer-worker.js
+
+.......................................................................................
+
+Hash:
+ Acts as redis with in redis--contains key value pair
+ Usually used for  aggregation, keeping related data together for easy fectching/updating
+
+
+Use case : A voting system with Hashes and Node.js
+
+1. Require the module redis.
+2. Create a Redis client instance.
+3. Create a function saveLink that has id, author, title, and link as arguments.
+4. Use HMSET to create a Hash with all fields.
+
+var redis = require("redis"); // 1
+var client = redis.createClient(); // 2
+
+function saveLink(id, author, title, link) { // 3
+  client.hmset("link:" + id, "author", author, "title", title, "link", link, "score", 0); // 4
+}
+
+function upVote(id) { // 1 
+  client.hincrby("link:" + id, "score", 1); // 2
+}
+
+function downVote(id) { //3 
+  client.hincrby("link:" + id, "score", -1); // 4
+}
+
+function showDetails(id) { // 1
+  client.hgetall("link:" + id, function(err, replies) { // 2
+    console.log("Title:", replies['title']); // 3 
+    console.log("Author:", replies['author']); // 3 
+    console.log("Link:", replies['link']); // 3 
+    console.log("Score:", replies['score']); // 3 
+    console.log("--------------------------");
+  }); 
+}
+
+saveLink(123, "dayvson", "Maxwell Dayvson's Github page", "https://github.com/dayvson");
+upVote(123);
+upVote(123);
+saveLink(456, "hltbra", "Hugo Tavares's Github page", "https://github.com/hltbra");
+upVote(456);
+upVote(456);
+downVote(456);
+showDetails(123);
+showDetails(456);
+client.quit();
+///////////////////////////////////////////////////////////////////////////////////////////
+
+Set : 
+
+->A Set in Redis is an unordered collection of distinct Strings—it's not possible to add repeated elements to a Set.
+Internally, a Set is implemented as a hash table, which is the reason that some operations are optimized: member addition, removal, and lookup run in O(1), constant time.
+->The maximum number of elements that a Set can hold is 232-1, which means that there can be more than 4 billion elements per Set.
+
+Use cases:
+•Data filtering: For example, filtering all flights that depart from a given
+city and arrive in another
+•Data grouping: Grouping all users who viewed similar products (for example, recommendations on Amazon.com)
+•Membership checking: Checking whether a user is on a blacklist
+
+set cli commands:
+
+sadd
+SADD user:max:favorite_artists "Arcade Fire" "Arctic Monkeys"
+"Belle & Sebastian" "Lenine"
+SADD user:hugo:favorite_artists "Daft Punk" "The Kooks" "Arctic
+Monkeys"
+
+Use case : Building a deal tracking system
+
+"Yipit, Groupon, and LivingSocial are examples of websites that send daily e-mails
+to users. These e-mails contain a Set of deals (coupons and discounts) that users
+are interested in. The deals are based on the area in which they live, as well their
+preferences."
+
+• Mark a deal as sent to a user
+• Check whether a user received a group of deals
+• Gather metrics from the sent deals
+
+Every deal is a Redis Set containing all user IDs that have received that deal. In the
+following examples, deals and users are referenced by IDs. Deal IDs are shown as
+deal:123, and user IDs are shown as user:123.
+
+deal-metrics.js
+
+var redis = require("redis");
+var client = redis.createClient();
+
+function markDealAsSent(dealId, userId) { // 1 
+  client.sadd(dealId, userId); // 2
+}
+
+function sendDealIfNotSent(dealId, userId) { // 1 
+  client.sismember(dealId, userId, function(err, reply) { // 2
+    if (reply) {
+      console.log("Deal", dealId, "was already sent to user", userId); // 3 
+    } else {
+      console.log("Sending", dealId, "to user", userId); // 4 
+      // code to send the deal to the user would go here... // 5 
+      markDealAsSent(dealId, userId); // 6
+    } 
+  });
+}
+
+function showUsersThatReceivedAllDeals(dealIds) { // 1 
+  client.sinter(dealIds, function(err, reply) { // 2
+    console.log(reply + " received all of the deals: " + dealIds); // 3 
+  });
+}
+
+function showUsersThatReceivedAtLeastOneOfTheDeals(dealIds) { // 1 
+  client.sunion(dealIds, function(err, reply) { // 2
+    console.log(reply + " received at least one of the deals: " + dealIds); // 3
+  });
+}
+
+markDealAsSent('deal:1', 'user:1');
+markDealAsSent('deal:1', 'user:2');
+markDealAsSent('deal:2', 'user:1');
+markDealAsSent('deal:2', 'user:3');
+sendDealIfNotSent('deal:1', 'user:1');
+sendDealIfNotSent('deal:1', 'user:2');
+sendDealIfNotSent('deal:1', 'user:3');
+showUsersThatReceivedAllDeals(["deal:1", "deal:2"]);
+showUsersThatReceivedAtLeastOneOfTheDeals(["deal:1", "deal:2"]);
+
+client.quit();
+
+..................................................................................
+
+Sorted Sets
+
+1.A Sorted Set is very similar to a Set, but each element of a Sorted Set has an
+associated score. 
+
+2.In other words, a Sorted Set is a collection of nonrepeating Strings
+sorted by score. It is possible to have elements with repeated scores. 
+
+3.In this case, the repeated elements are ordered lexicographically (in alphabetical order).
+
+
+Use cases:
+
+• Build a real time waiting list for customer service
+• Show a leaderboard of a massive online game that displays the top players,
+users with similar scores, or the scores of your friends
+• Build an autocomplete system using millions of words
+
+Sorted set  redis-cli commands:
+
+1.Zadd
+2.ZRange
+3ZRANGEBYLEX, ZRANGEBYSCORE, ZREVRANGE, ZREVRANGEBYLEX
+
+
+Use case :
+
+Building a leaderboard system for an online game
+
+• Add and remove users
+• Display the details of a user
+• Show the top x users
+• Show the users who are directly ranked above and below a given user
+
+
+BitMaps:
+.......
+A Bitmap is not a real data type in Redis. Under the hood, a Bitmap is a String.
+We can also say that a Bitmap is a set of bit operations on a String. However, we
+are going to consider them as data types because Redis provides commands to
+manipulate Strings as Bitmaps. Bitmaps are also known as bit arrays or bitsets.
+A Bitmap is a sequence of bits where each bit can store 0 or 1. You can think of a
+Bitmap as an array of ones and zeroes. The Redis documentation refers to Bitmap
+indices as offsets. The application domain dictates what each Bitmap index means.
+Bitmaps are memory efficient, support fast data lookups, and can store up to 232 bits
+(more than 4 billion bits).
+
+
+Use case:
+
+The  application that needs to store all
+user IDs that visited a website on a given day (the Bitmap offset represents a user
+ID). We assume that our application has 5 million users in total, but only 2 million
+users visited the website on that day, and that each user ID can be represented by
+4 bytes (32 bits, which is the size of an integer in a 32-bit computer).
+
+
+BitMap cli commands
+
+
+1.setbit
+2.getbit
+3.bitcount
+4.bitop
+
+
+Use case:
+Building web analytics
+This section creates a simple web analytics system to save and count daily user visits
+to a website and then retrieve user IDs from the visits on a given date.
+
+
+metrics-bitmap.js
+
+var redis = require("redis");
+var client = redis.createClient({return_buffers: true}); // 1
+
+function storeDailyVisit(date, userId) { // 2
+  var key = 'visits:daily:' + date; // 3
+  client.setbit(key, userId, 1, function(err, reply) { // 4
+    console.log("User", userId, "visited on", date); // 5 
+  });
+}
+
+function countVisits(date) { // 1
+  var key = 'visits:daily:' + date; // 2 
+  client.bitcount(key, function(err, reply) { // 3
+    console.log(date, "had", reply.toString(), "visits."); // 4 
+  });
+}
+
+function showUserIdsFromVisit(date) { // 1
+  var key = 'visits:daily:' + date; // 2 
+  client.get(key, function(err, bitmapValue) { // 3
+    var userIds = []; // 4
+    var data = bitmapValue.toJSON().data; // 5
+    data.forEach(function(byte, byteIndex) { // 6
+      for (var bitIndex = 7 ; bitIndex >= 0 ; bitIndex--) { // 7
+        var visited = byte >> bitIndex & 1; // 8
+        if (visited === 1) { // 9
+          var userId = byteIndex * 8 + (7 - bitIndex); // 10 
+          userIds.push(userId); // 11
+        } 
+      }
+    });
+    console.log("Users " + userIds + " visited on " + date); // 12 
+  });
+}
+
+storeDailyVisit('2015-01-01', '1');
+storeDailyVisit('2015-01-01', '2');
+storeDailyVisit('2015-01-01', '10');
+storeDailyVisit('2015-01-01', '55');
+countVisits('2015-01-01');
+showUserIdsFromVisit('2015-01-01');
+
+client.quit();

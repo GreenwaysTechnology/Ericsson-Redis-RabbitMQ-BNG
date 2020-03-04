@@ -1,0 +1,976 @@
+Starting Rabbitmq-server:
+........................
+
+How rabbit-MQ Server starts?
+
+Default Work Flow:
+
+if you enter this script in the shell
+
+$sudo rabbitmq-server
+
+ Rabbitmq starts searching the file from "/etc/rabbitmq/rabbitmq-env.conf" 
+ |
+   It reads the environment settings for basic rabbitmq server details
+
+
+ The above one starts a node with default settings.
+	"Once rabbitmq is installed, rabbitq server is installed as single node with name 
+	"rabbit"  and default port is 5672 and log files are generatd in in the locaiton
+	/var/log/rabbitmq"
+
+
+	
+  
+key environment variables that can be used to configure RabbitMQ:
+.................................................................
+RABBITMQ_NODE_IP_ADDRESS:
+	Change this if you only want to bind to one network interface. Binding to two or more interfaces can be set up in the configuration file.
+	Default: an empty string, meaning "bind to all network interfaces".
+
+RABBITMQ_NODE_PORT	
+	Default: 5672.
+
+RABBITMQ_NODENAME
+	The node name should be unique per Erlang-node-and-machine combination. To run multiple nodes, see the clustering guide.
+	Default:
+	Unix*: rabbit@$HOSTNAME
+	Windows: rabbit@%COMPUTERNAME%
+
+RABBITMQ_CONFIG_FILE
+	Main RabbitMQ config file path.
+
+RABBITMQ_ADVANCED_CONFIG_FILE
+	"Advanced" (Erlang term-based) RabbitMQ config file 
+
+RABBITMQ_CONF_ENV_FILE
+	Location of the file that contains environment variable definitions (without the RABBITMQ_ prefix).
+   default
+	Ubuntu and Debian: /etc/rabbitmq/rabbitmq-env.conf
+
+RABBITMQ_MNESIA_BASE
+	This base directory contains sub-directories for the RabbitMQ server's node database, message store and cluster state files, one for each node, unless RABBITMQ_MNESIA_DIR is set explicitly.
+
+  default:
+	Ubuntu and Debian packages: /var/lib/rabbitmq/mnesia/
+
+RABBITMQ_MNESIA_DIR
+	The directory where this RabbitMQ node's data is stored. This s a schema database, message stores, cluster member information and other persistent node state.
+
+RABBITMQ_PLUGINS_DIR
+	The list of directories where plugin archive files are located and extracted from. This is PATH-like variable, where different paths are separated by an OS-specific separator (: for Unix, ; for Windows). Plugins can be installed to any of the directories listed here. Must not contain any characters mentioned in the path restriction section.
+
+	Ubuntu and Debian packages: /var/lib/rabbitmq/plugins
+
+
+Ways to start RabbitMQ Server:
+******************************
+
+1.default node starting 
+  $ sudo rabbitmq-server
+
+2.Customized node starting / if you want to run multiple nodes on the single machine.
+  -For High availablity : (Clustering)
+
+ Note: in order to have more nodes on  single machine
+   -NodeName and Port must be unique.
+
+2.1.Setting RabbitMQ env variables in the shell before starting server.
+
+    $sudo RABBITMQ_NODE_PORT=5673 RABBITMQ_NODENAME=hare rabbitmq-server
+       ->Interactive Mode
+    $sudo RABBITMQ_NODE_PORT=5673 RABBITMQ_NODENAME=hare rabbitmq-server -detached
+      ->in background mode
+
+  -detached
+           Start the server process in the background. Note that this will cause the pid not            to be written to the pid file.
+   
+2.2.Setting RabbitMQ env variables in the env file.
+    "/etc/rabbitmq/rabbitmq-env.conf"
+
+rabbitmq-env.conf - default settings for RabbitMQ AMQP server
+
+
+/etc/rabbitmq/rabbitmq-env.conf contains variable settings that override the defaults
+built in to the RabbitMQ startup scripts.
+
+" The file is interpreted by the system shell, and so should consist of a sequence of shell
+       environment variable definitions. Normal shell syntax is permitted (since the file is
+       sourced using the shell "." operator), including line comments starting with "#".
+
+       In order of preference, the startup scripts get their values from the environment, from
+       /etc/rabbitmq/rabbitmq-env.conf and finally from the built-in default values. For example,
+       for the RABBITMQ_NODENAME setting,
+
+       RABBITMQ_NODENAME
+
+       from the environment is checked first. If it is absent or equal to the empty string, then
+
+       NODENAME
+
+       from /etc/rabbitmq/rabbitmq-env.conf is checked. If it is also absent or set equal to the
+       empty string then the default value from the startup script is used.
+
+       The variable names in /etc/rabbitmq/rabbitmq-env.conf are always equal to the environment
+       variable names, with the RABBITMQ_ prefix removed: RABBITMQ_NODE_PORT from the environment
+       becomes NODE_PORT in the /etc/rabbitmq/rabbitmq-env.conf file, etc.
+
+       # I am a complete /etc/rabbitmq/rabbitmq-env.conf file.
+       # Comment lines start with a hash character.
+       # This is a /bin/sh script file - use ordinary envt var syntax
+       NODENAME=hare
+"
+
+  This is an example of a complete /etc/rabbitmq/rabbitmq-env.conf file that overrides the
+       default Erlang node name from "rabbit" to "har
+
+
+
+# Example rabbitmq-env.conf file entries. Note that the variables
+# do not have the RABBITMQ_ prefix.
+#
+# Overrides node name
+NODENAME=bunny@myhost
+
+# Specifies new style config file location
+CONFIG_FILE=/etc/rabbitmq/rabbitmq.conf
+
+# Specifies advanced config file location
+ADVANCED_CONFIG_FILE=/etc/rabbitmq/advanced.config
+
+.........................*****...........................................................
+
+So the Flow would be like below
+
+$sudo rabbitmq-server
+   |
+   ------------->rabbitmq-env.conf
+			|
+			 Global env settings initalized
+			  |
+			   ----------CONFIG_FILE=/etc/rabbitmq/rabbitmq.conf
+			   ----------ADVANCED_CONFIG_FILE=/etc/rabbitmq/advanced.config
+
+
+Overriding env settings
+
+$sudo RABBITMQ_NODENAME=server-1 RABBIT_NODE_PORT=5678 rabbitmq-server
+   |
+   ------------->rabbitmq-env.conf
+			|
+			 Global env settings initalized
+			  |
+			   ----------CONFIG_FILE=/etc/rabbitmq/rabbitmq.conf
+			   ----------ADVANCED_CONFIG_FILE=/etc/rabbitmq/advanced.config
+
+
+note: these config files not present by default , once if you install server,can be created and changed: refer sample config file, and override if you want to change any thing.
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
+RabbitMQ Configuration Classification:
+
+Note:
+  dont confuse with rabbitmq-env.conf with rabbit.conf and advanced.config files 
+
+RabbitMQ can be configured in many ways
+
+1.config files
+	1.1. rabbit.conf
+	1,2.advanced.config
+
+  TCP listeners and other networking-related settings
+  TLS
+  resource constraints (alarms)
+  authentication and authorisation backends
+  message store settings
+
+2.Environment Variables
+ define node name, file and directory locations, runtime flags taken from the shell, or set in the environment configuration file, rabbitmq-env.conf (Linux, MacOS, BSD) and rabbitmq-env-conf.bat (Windows)
+
+3.rabbitmqctl
+	When internal authentication/authorisation backend is used, rabbitmqctl is the tool that manages virtual hosts, users and permissions.
+
+4.rabbitmq-plugins
+	rabbitmq-plugins is the tool that manages enabled plugins.
+
+5.Parameters and Policies
+	defines cluster-wide settings which can change at run time as well as settings that are convenient to configure for groups of queues (exchanges, etc) such as including optional queue arguments.
+
+6.Runtime (Erlang VM) Flags
+	Control lower-level aspects of the system: memory allocation settings, inter-node communication buffer size, runtime scheduler settings and more.
+
+7.Operating System Kernel Limits
+Control process limits enforced by the kernel: max open file handle limit, max number of processes and kernel threads, max resident set size and so on.
+
+
+.............................................................................................
+
+
+Command Line Tools
+
+rabbitmqctl 
+ for service management and general operator tasks
+rabbitmq-diagnostics
+  for diagnostics and health checking
+rabbitmq-plugins
+  for plugin management
+rabbitmq-queues 
+   for maintenance tasks on queues, in particular quorum queues
+rabbitmq-upgrade
+  for maintenance tasks related to upgrades
+rabbitmqadmin 
+ for operator tasks over HTTP API
+
+different tools for different operations.
+
+For example, rabbitmqctl is usually only available to RabbitMQ administrator given that it provides full control over a node, including virtual host, user and permission management, destructive operations on node's data and so on.
+
+
+How to shutdown server?
+
+rabbitmqctl
+
+$rabbitmqctl [--node <node>] [--timeout <timeout>] [--longnames] [--quite] <command> <commandoptions>
+
+$rabbitmqctl --node server-1        stop | shutdown
+  |            |       |             |
+ control      options optionvalue  command 
+
+
+~$ sudo rabbitmqctl --node master-node shutdown
+Shutting down RabbitMQ node master-node@subramanian-VirtualBox running at PID 29276
+Waiting for PID 29276 to terminate
+RabbitMQ node master-node@subramanian-VirtualBox running at PID 29276 successfully shut down
+
+
+~$ sudo rabbitmqctl --node master-node stop
+Stopping and halting node master-node@subramanian-VirtualBox ...
+subramanian@subramanian-VirtualBox:~$ 
+
+
+
+**********************...........................*********************************************
+How to know status of running node?
+
+
+
+sudo rabbitmqctl --node master-node status
+Status of node master-node@subramanian-VirtualBox ...
+Runtime
+
+OS PID: 8288
+OS: Linux
+Uptime (seconds): 18
+RabbitMQ version: 3.8.2
+Node name: master-node@subramanian-VirtualBox
+Erlang configuration: Erlang/OTP 22 [erts-10.6.4] [source] [64-bit] [smp:1:1] [ds:1:1:10] [async-threads:64] [hipe]
+Erlang processes: 256 used, 1048576 limit
+Scheduler run queue: 1
+Cluster heartbeat timeout (net_ticktime): 60
+
+Plugins
+
+Enabled plugin file: /etc/rabbitmq/enabled_plugins
+Enabled plugins:
+
+
+Data directory
+
+Node data directory: /var/lib/rabbitmq/mnesia/master-node
+
+Config files
+
+ * /etc/rabbitmq/advanced.config
+ * /etc/rabbitmq/rabbitmq.conf
+
+Log file(s)
+
+ * /var/log/rabbitmq/master-node.log
+ * /var/log/rabbitmq/master-node_upgrade.log
+
+Alarms
+
+(none)
+
+Memory
+
+Calculation strategy: rss
+Memory high watermark setting: 0.4 of available memory, computed to: 4.5456 gb
+code: 0.027 gb (31.31 %)
+other_proc: 0.0249 gb (28.9 %)
+allocated_unused: 0.0141 gb (16.36 %)
+other_system: 0.0111 gb (12.82 %)
+reserved_unallocated: 0.0048 gb (5.51 %)
+other_ets: 0.0026 gb (3.05 %)
+atom: 0.0014 gb (1.66 %)
+binary: 0.0002 gb (0.18 %)
+mnesia: 0.0001 gb (0.09 %)
+metrics: 0.0 gb (0.06 %)
+msg_index: 0.0 gb (0.03 %)
+plugins: 0.0 gb (0.01 %)
+quorum_ets: 0.0 gb (0.01 %)
+connection_channels: 0.0 gb (0.0 %)
+connection_other: 0.0 gb (0.0 %)
+connection_readers: 0.0 gb (0.0 %)
+connection_writers: 0.0 gb (0.0 %)
+mgmt_db: 0.0 gb (0.0 %)
+queue_procs: 0.0 gb (0.0 %)
+queue_slave_procs: 0.0 gb (0.0 %)
+quorum_queue_procs: 0.0 gb (0.0 %)
+
+File Descriptors
+
+Total: 2, limit: 927
+Sockets: 0, limit: 832
+
+Free Disk Space
+
+Low free disk space watermark: 0.05 gb
+Free disk space: 1.1426 gb
+
+Totals
+
+Connection count: 0
+Queue count: 0
+Virtual host count: 1
+
+Listeners
+
+Interface: [::], port: 25672, protocol: clustering, purpose: inter-node and CLI tool communication
+Interface: [::], port: 5672, protocol: amqp, purpose: AMQP 0-9-1 and AMQP 1.0
+////////////////////////////////////////////////////////////////////////////////////////
+
+How to make rabbitmq distributed?
+
+Rabbitmq is by default is distributed because, which is written erlng which is most powerful
+distributed pl.
+
+Distributed implementation:
+..........................
+
+1.clustering, 
+2.Federation
+3.Shovel plugin
+
+
+"Note that all three approaches are not mutually exclusive and can be combined: clusters can be connected together with Federation or Shovel, or both."
+
+
+1.clustering:
+
+1.Clustering connects multiple machines together to form a cluster. 
+2.Inter-node communication is performed transparently to clients
+3.The design of clustering assumes that network connections are reasonably reliable and   provides a LAN-like latency.
+4.All nodes in the cluster must run compatible versions of RabbitMQ and Erlang.
+5.Nodes authenticate to each other using a pre-shared secret typically installed by deployment automation tools.
+6.Virtual hosts, exchanges, users, and permissions are automatically replicated across all nodes in a cluster.
+7.Queues may be located on a single node, or mirrored across multiple nodes.
+8.A client connecting to any node in a cluster can use all non-exclusive queues in the cluster, even if they are not located on that node
+8.Clustering nodes can help improve availability, data safety of queue contents and sustain more concurrent client connections
+
+
+Basic concepts in clustering
+
+1.	How RabbitMQ nodes are identified: node names
+2.	Requirements for clustering
+3.	What data is and isn't replicated between cluster nodes
+4.	What clustering means for clients
+5.	How clusters are formed
+6.	How nodes authenticate to each other (and with CLI tools)
+7.	Why two cluster nodes are highly recommended against
+8.	Node restarts and how nodes rejoin their cluster
+9.	How to remove a cluster node
+10.	How to reset a cluster node
+
+
+Cluster Formation
+Ways of Forming a Cluster
+A RabbitMQ cluster can formed in a number of ways:
+
+Declaratively by listing cluster nodes in config file
+Declaratively using DNS-based discovery
+Declaratively using AWS (EC2) instance discovery (via a plugin)
+Declaratively using Kubernetes discovery (via a plugin)
+Declaratively using Consul-based discovery (via a plugin)
+Declaratively using etcd-based discovery (via a plugin)
+Manually with rabbitmqctl
+
+How RabbitMQ nodes are identified: node names
+.............................................
+
+Node Names (Identifiers):
+ RabbitMQ nodes are identified by node names
+node can be any thing but has some recommendation
+
+rabbit@hostname
+
+For example, rabbit@node1.messaging.svc.locaL
+
+
+Note:
+Node names in a cluster must be unique. If more than one node is running on a given host (this is usually the case in development and QA environments), they must use different prefixes, e.g. rabbit1@hostname and rabbit2@hostname.
+
+In a cluster, nodes identify and contact each other using node names
+
+This means that the hostname part of every node name must resolve. CLI tools also identify and address nodes using node names.
+When a node starts up, it checks whether it has been assigned a node name.
+This is done via the RABBITMQ_NODENAME environment variable. 
+
+If no value was explicitly configured, the node resolves its hostname and prepends rabbit to it to compute its node name.
+
+if a system uses fully qualified domain names (FQDNs) for hostnames, RabbitMQ nodes and CLI tools must be configured to use so called long node names. For server nodes this is done by setting the RABBITMQ_USE_LONGNAME environment variable to true.
+
+For CLI tools, either RABBITMQ_USE_LONGNAME must be set or the --longnames option must be specified.
+
+
+Cluster Formation Requirements:
+...............................
+
+Hostname Resolution
+	
+1.RabbitMQ nodes address each other using domain names, either short or fully-qualified (FQDNs).
+
+2.Therefore hostnames of all cluster members must be resolvable from all cluster nodes, as well as machines on which command line tools such as rabbitmqctl might be used.
+
+Port Access
+
+RabbitMQ nodes bind to ports (open server TCP sockets) in order to accept client and CLI tool connections
+
+4369: epmd, a helper discovery daemon used by RabbitMQ nodes and CLI tools
+
+EPMD and Inter-node Communicationl
+	What is EPMD and How is It Used?
+
+epmd (for Erlang Port Mapping Daemon) is a small additional daemon that runs alongside every RabbitMQ node and is used by the runtime to discover what port a particular node listens on. 
+
+When a node or CLI tool needs to contact node rabbit@hostname2 it will do the following:
+****************************************************************************************
+
+1.Resolve hostname2 to an IP4 or IPv6 address using the standard OS resolver or a custom one specified in the inetrc file
+
+2.Contact epmd running on hostname2 using the above address
+
+3.Ask epmd for the port used by node rabbit on it
+4.Contact the node using the resolved IP address and discovered port
+5.Proceed with communication
+
+5672, 5671: used by AMQP 0-9-1 and 1.0 clients without and with TLS
+
+25672: used for inter-node and CLI tools communication (Erlang distribution server port) and is allocated from a dynamic range (limited to a single port by default, computed as AMQP port + 20000)
+
+35672-35682: used by CLI tools (Erlang distribution client ports) for communication with nodes and is allocated from a dynamic range (computed as server distribution port + 10000 through server distribution port + 10010). See networking guide for details.
+*******************************************************************************************
+
+Nodes in a Cluster
+
+What is Replicated?
+All data/state required for the operation of a RabbitMQ broker is replicated across all nodes	
+
+An exception to this are message queues, which by default reside on one node, though they are visible and reachable from all nodes.
+
+
+Can we replicate Queues?
+
+ Yes! How ?
+    Via Highly Available (Mirrored) Queues
+
+
+
+
+https://www.rabbitmq.com/distributed.html
+https://www.rabbitmq.com/clustering.html#cluster-formation
+https://www.rabbitmq.com/ha.html#non-mirrored-queue-behavior-on-node-failure
+https://www.rabbitmq.com/ha.html
+////////////////////////////////////////////////////////////////////////////////////////////
+
+Demo:
+
+Starting Independant Nodes:
+
+Steps
+node 1 : from basic config file
+
+ sudo rabbitmq-server
+
+node 2 : by overriding the config 
+sudo RABBITMQ_NODE_PORT=5674 RABBITMQ_NODENAME=mynode-1 rabbitmq-server
+
+node-3 by overriding the confg
+sudo RABBITMQ_NODE_PORT=5675  RABBITMQ_NODENAME=mynode-2 rabbitmq-server
+
+
+
+Know the cluster status on each node:
+This creates three independent RabbitMQ brokers, one on each node, as confirmed by the cluster_status command:
+
+******************************************************************************************
+
+step 2 :
+
+open terminal :
+
+Check cluster status on each node:
+
+$sudo rabbitmqctl --node master-node cluster_status
+[sudo] password for subramanian: 
+Cluster status of node master-node@subramanian-VirtualBox ...
+Basics
+
+Cluster name: master-node@subramanian-VirtualBox
+
+Disk Nodes
+
+master-node@subramanian-VirtualBox
+
+Running Nodes
+
+master-node@subramanian-VirtualBox
+
+Versions
+
+master-node@subramanian-VirtualBox: RabbitMQ 3.8.2 on Erlang 22.2.6
+
+Alarms
+
+(none)
+
+Network Partitions
+
+(none)
+
+Listeners
+
+Node: master-node@subramanian-VirtualBox, interface: [::], port: 25672, protocol: clustering, purpose: inter-node and CLI tool communication
+Node: master-node@subramanian-VirtualBox, interface: [::], port: 5672, protocol: amqp, purpose: AMQP 0-9-1 and AMQP 1.0
+
+Feature flags
+
+Flag: implicit_default_bindings, state: enabled
+Flag: quorum_queue, state: enabled
+Flag: virtual_host_metadata, state: enabled
+
+
+
+$ sudo rabbitmqctl --node mynode-1 cluster_status
+Cluster status of node mynode-1@subramanian-VirtualBox ...
+Basics
+
+Cluster name: mynode-1@subramanian-VirtualBox
+
+Disk Nodes
+
+mynode-1@subramanian-VirtualBox
+
+Running Nodes
+
+mynode-1@subramanian-VirtualBox
+
+Versions
+
+mynode-1@subramanian-VirtualBox: RabbitMQ 3.8.2 on Erlang 22.2.6
+
+Alarms
+
+(none)
+
+Network Partitions
+
+(none)
+
+Listeners
+
+Node: mynode-1@subramanian-VirtualBox, interface: [::], port: 25674, protocol: clustering, purpose: inter-node and CLI tool communication
+Node: mynode-1@subramanian-VirtualBox, interface: [::], port: 5674, protocol: amqp, purpose: AMQP 0-9-1 and AMQP 1.0
+
+Feature flags
+
+Flag: implicit_default_bindings, state: enabled
+Flag: quorum_queue, state: enabled
+
+$ sudo rabbitmqctl --node mynode-2 cluster_status
+Cluster status of node mynode-2@subramanian-VirtualBox ...
+Basics
+
+Cluster name: mynode-2@subramanian-VirtualBox
+
+Disk Nodes
+
+mynode-2@subramanian-VirtualBox
+
+Running Nodes
+
+mynode-2@subramanian-VirtualBox
+
+Versions
+
+mynode-2@subramanian-VirtualBox: RabbitMQ 3.8.2 on Erlang 22.2.6
+
+Alarms
+
+(none)
+
+Network Partitions
+
+(none)
+
+Listeners
+
+Node: mynode-2@subramanian-VirtualBox, interface: [::], port: 25675, protocol: clustering, purpose: inter-node and CLI tool communication
+Node: mynode-2@subramanian-VirtualBox, interface: [::], port: 5675, protocol: amqp, purpose: AMQP 0-9-1 and AMQP 1.0
+
+Feature flags
+
+Flag: implicit_default_bindings, state: enabled
+Flag: quorum_queue, state: enabled
+Flag: virtual_host_metadata, state: enabled
+
+
+******************************************************************************************
+
+step 3: create cluster
+
+In order to link three nodes in a cluster.
+
+master-node@subramanian-VirtualBox
+mynode-1@subramanian-VirtualBox
+mynode-2@subramanian-VirtualBox
+
+before join
+we have to reset all the nodes
+
+we will first join  master-node with mynode-1
+
+To do that, on  mynode-1@@subramanian-VirtualBox we stop the RabbitMQ application and join the master-node@subramanian-VirtualBox cluster.then restart the RabbitMQ application. 
+
+
+$ sudo rabbitmqctl --node mynode-2  stop_app
+Stopping rabbit application on node mynode-2@subramanian-VirtualBox ...
+
+
+Note that a node must be reset before it can join an existing cluster. 
+ "Resetting the node removes all resources and data that were previously 
+  present on that node" 
+
+Reset:
+.......
+
+$ sudo rabbitmqctl --node mynode-2  reset
+Resetting node mynode-2@subramanian-VirtualBox ...
+
+
+Join with Cluster:
+...................
+
+
+$ sudo rabbitmqctl --node master-node  start_app
+Starting node master-node@subramanian-VirtualBox ...
+
+$ sudo rabbitmqctl --node mynode-1@subramanian-VirtualBox  join_cluster master-node@subramanian-VirtualBox
+
+Clustering node mynode-1@subramanian-VirtualBox with master-node@subramanian-VirtualBox
+
+
+Know the cluster status:
+
+for master node
+
+$ sudo rabbitmqctl --node master-node cluster_status
+Cluster status of node master-node@subramanian-VirtualBox ...
+Basics
+
+Cluster name: master-node@subramanian-VirtualBox
+
+Disk Nodes
+
+master-node@subramanian-VirtualBox
+mynode-1@subramanian-VirtualBox
+
+Running Nodes
+
+master-node@subramanian-VirtualBox
+
+Versions
+
+master-node@subramanian-VirtualBox: RabbitMQ 3.8.2 on Erlang 22.2.6
+
+Alarms
+
+(none)
+
+Network Partitions
+
+(none)
+
+Listeners
+
+Node: master-node@subramanian-VirtualBox, interface: [::], port: 25672, protocol: clustering, purpose: inter-node and CLI tool communication
+Node: master-node@subramanian-VirtualBox, interface: [::], port: 5672, protocol: amqp, purpose: AMQP 0-9-1 and AMQP 1.0
+
+Feature flags
+
+Flag: implicit_default_bindings, state: enabled
+Flag: quorum_queue, state: enabled
+Flag: virtual_host_metadata, state: enabled
+
+
+node 2:
+
+$ sudo rabbitmqctl --node mynode-1 start_app
+
+$ sudo rabbitmqctl --node mynode-1 cluster_status
+Cluster status of node mynode-1@subramanian-VirtualBox ...
+Basics
+
+Cluster name: master-node@subramanian-VirtualBox
+
+Disk Nodes
+
+master-node@subramanian-VirtualBox
+mynode-1@subramanian-VirtualBox
+
+Running Nodes
+
+master-node@subramanian-VirtualBox
+mynode-1@subramanian-VirtualBox
+
+Versions
+
+master-node@subramanian-VirtualBox: RabbitMQ 3.8.2 on Erlang 22.2.6
+mynode-1@subramanian-VirtualBox: RabbitMQ 3.8.2 on Erlang 22.2.6
+
+Alarms
+
+(none)
+
+Network Partitions
+
+(none)
+
+Listeners
+
+Node: master-node@subramanian-VirtualBox, interface: [::], port: 25672, protocol: clustering, purpose: inter-node and CLI tool communication
+Node: master-node@subramanian-VirtualBox, interface: [::], port: 5672, protocol: amqp, purpose: AMQP 0-9-1 and AMQP 1.0
+Node: mynode-1@subramanian-VirtualBox, interface: [::], port: 25674, protocol: clustering, purpose: inter-node and CLI tool communication
+Node: mynode-1@subramanian-VirtualBox, interface: [::], port: 5674, protocol: amqp, purpose: AMQP 0-9-1 and AMQP 1.0
+
+Feature flags
+
+Flag: implicit_default_bindings, state: enabled
+Flag: quorum_queue, state: enabled
+Flag: virtual_host_metadata, state: enabled
+///////////////////////////////////////////////////////////////////////////////////////////
+
+How to  add  new Node on existing cluster?
+
+
+# on rabbit3
+rabbitmqctl stop_app
+# => Stopping node rabbit@rabbit3 ...done.
+$ sudo rabbitmqctl --node mynode-2 stop_app
+
+# on rabbit3
+rabbitmqctl reset
+# => Resetting node rabbit@rabbit3 ...
+$ sudo rabbitmqctl --node mynode-2 reset
+
+rabbitmqctl join_cluster rabbit@rabbit2
+# => Clustering node rabbit@rabbit3 with rabbit@rabbit2 ...done.
+
+sudo rabbitmqctl --node mynode-2 join_cluster mynode-1
+
+rabbitmqctl start_app
+# => Starting node rabbit@rabbit3 ...done.
+
+sudo rabbitmqctl --node mynode-2 start_app
+
+..............................................................................................
+
+Testing node failures in clusters:
+.................................
+
+Stop the Master node:
+
+$sudo rabbitmqctl --node master-node stop
+
+Check cluster status:
+
+$ sudo rabbitmqctl --node mynode-1 cluster_status
+Cluster status of node mynode-1@subramanian-VirtualBox ...
+Basics
+
+Cluster name: master-node@subramanian-VirtualBox
+
+Disk Nodes
+
+master-node@subramanian-VirtualBox
+mynode-1@subramanian-VirtualBox
+mynode-2@subramanian-VirtualBox
+
+Running Nodes
+
+mynode-1@subramanian-VirtualBox
+mynode-2@subramanian-VirtualBox
+
+Versions
+
+mynode-1@subramanian-VirtualBox: RabbitMQ 3.8.2 on Erlang 22.2.6
+mynode-2@subramanian-VirtualBox: RabbitMQ 3.8.2 on Erlang 22.2.6
+
+Alarms
+
+(none)
+
+Network Partitions
+
+(none)
+
+Listeners
+
+Node: mynode-1@subramanian-VirtualBox, interface: [::], port: 25674, protocol: clustering, purpose: inter-node and CLI tool communication
+Node: mynode-1@subramanian-VirtualBox, interface: [::], port: 5674, protocol: amqp, purpose: AMQP 0-9-1 and AMQP 1.0
+Node: mynode-2@subramanian-VirtualBox, interface: [::], port: 25675, protocol: clustering, purpose: inter-node and CLI tool communication
+Node: mynode-2@subramanian-VirtualBox, interface: [::], port: 5675, protocol: amqp, purpose: AMQP 0-9-1 and AMQP 1.0
+
+Feature flags
+
+Flag: implicit_default_bindings, state: enabled
+Flag: quorum_queue, state: enabled
+Flag: virtual_host_metadata, state: enabled
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+Restart /start existing stopped node and checking cluster status:
+.................................................................
+
+
+$sudo rabbitmqctl --node master-node stop
+
+$sudo rabbitmqctl --node mynode-1 cluster_status
+
+Running Nodes
+
+mynode-1@subramanian-VirtualBox
+mynode-2@subramanian-VirtualBox
+
+
+$sudo rabbitmq-server
+
+$sudo rabbitmqctl --node mynode-1 cluster_status
+
+********************************************************************************************
+Break up a cluster Node:
+
+ How to come out from the cluster
+
+stop the app on node where y want to remove from cluster?
+
+
+rabbitmqctl stop_app
+
+rabbitmqctl reset
+
+rabbitmqctl start_app
+
+rabbitmqctl cluster_status
+
+~$ sudo rabbitmqctl --node mynode-3 stop_app
+Stopping rabbit application on node mynode-3@subramanian-VirtualBox ...
+~$ sudo rabbitmqctl --node mynode-3 reset
+Resetting node mynode-3@subramanian-VirtualBox ...
+~$ sudo rabbitmqctl --node mynode-3 start_app
+Starting node mynode-3@subramanian-VirtualBox ...
+ completed with 0 plugins.
+~$ sudo rabbitmqctl --node mynode-3 cluster_status
+Cluster status of node mynode-3@subramanian-VirtualBox ...
+Basics
+
+Cluster name: mynode-3@subramanian-VirtualBox
+
+Disk Nodes
+
+mynode-3@subramanian-VirtualBox
+
+Running Nodes
+
+mynode-3@subramanian-VirtualBox
+
+Versions
+
+mynode-3@subramanian-VirtualBox: RabbitMQ 3.8.2 on Erlang 22.2.6
+
+Alarms
+
+(none)
+
+Network Partitions
+
+(none)
+
+Listeners
+
+Node: mynode-3@subramanian-VirtualBox, interface: [::], port: 25676, protocol: clustering, purpose: inter-node and CLI tool communication
+Node: mynode-3@subramanian-VirtualBox, interface: [::], port: 5676, protocol: amqp, purpose: AMQP 0-9-1 and AMQP 1.0
+
+Feature flags
+
+Flag: implicit_default_bindings, state: enabled
+Flag: quorum_queue, state: enabled
+Flag: virtual_host_metadata, state: enabled
+
+..........................................................................................
+
+How to remove a node from remotly(we can remove nodes in cluster from other nodes)?
+
+Objective:
+
+i want to remove mynode-1 from mynode-2
+
+We can for example remove rabbit@rabbi1 from rabbit@rabbit2.
+
+
+# on rabbit1
+rabbitmqctl stop_app
+# => Stopping node rabbit@rabbit1 ...done.
+
+~$ sudo rabbitmqctl  --node mynode-1 stop_app
+Stopping rabbit application on node mynode-1@subramanian-VirtualBox ...
+
+
+# on rabbit2
+rabbitmqctl forget_cluster_node rabbit@rabbit1
+# => Removing node rabbit@rabbit1 from cluster ...
+# => ...done.
+
+$ sudo rabbitmqctl  --node mynode-2 forget_cluster_node mynode-1@subramanian-VirtualBox
+Removing node mynode-1@subramanian-VirtualBox from the cluster
+subramanian@subramanian-VirtualBox:~$ 
+
+"Note that rabbit1 still thinks its clustered with rabbit2, and trying to start it will result in an error. We will need to reset it to be able to start it again."
+
+~$ sudo rabbitmqctl --node mynode-1 start_app
+
+Starting node mynode-1@subramanian-VirtualBox ...
+Error:
+{:error, {:inconsistent_cluster, 'Node \'mynode-1@subramanian-VirtualBox\' thinks it\'s clustered with node \'mynode-3@subramanian-VirtualBox\', but \'mynode-3@subramanian-VirtualBox\' disagrees'}}
+
+
+subramanian@subramanian-VirtualBox:~$ sudo rabbitmqctl --node mynode-1 reset
+
+Resetting node mynode-1@subramanian-VirtualBox ...
+subramanian@subramanian-VirtualBox:~$ sudo rabbitmqctl --node mynode-1 start_app
+
+
+---------------------------------------------***************--------------------------------
+
+High availablity: Queue Mirroring:
+
+
+
+
+
+
+
+

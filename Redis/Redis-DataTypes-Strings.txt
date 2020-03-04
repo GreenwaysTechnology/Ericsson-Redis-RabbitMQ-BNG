@@ -1,0 +1,190 @@
+Redis-Strings:
+
+Strings:
+
+Strings are the most basic kind of Redis value.
+Redis Strings are binary safe, this means that a Redis string can contain any kind of data, for instance a JPEG image or a serialized Ruby/JSON object.
+
+A String value can be at max 512 Megabytes in length
+
+You can do a number of interesting things using strings in Redis, for instance you can:
+.........................................................................................
+
+1.Use Strings as atomic counters using commands in the INCR family: INCR, DECR, INCRBY.
+2.Append to strings with the APPEND command.
+3.Use Strings as a random access vectors with GETRANGE and SETRANGE.
+4.Encode a lot of data in little space, or create a Redis backed Bloom Filter using GETBIT and SETBIT.
+
+
+Simple Strings
+
+1.Setting and Getting Values
+
+1.1.Set and get
+  set the variable and value
+  can be replaced with old value
+eg:
+
+>set name Subramanian
+OK
+>get name
+"Subramanian"
+
+1.2.MSet and MGET  : setting many keys and values at once,getting all keys at once
+MSET key value [key value ...]
+
+MSET is atomic, so all given keys are set at once. It is not possible for clients to see that some of the keys were updated while others are unchanged
+
+>mset name subramanian age 39 city coimbatore
+>mget name age city
+
+
+1.5.SETNX key value
+
+Set key to hold string value if key does not exist. 
+In that case, it is equal to SET. When key already holds a value, no operation is performed. SETNX is short for "SET if Not eXists"
+
+
+>setnx name subu
+1
+>setnx name ram
+0
+
+Return value
+Integer reply, specifically:
+
+1 if the key was set
+0 if the key was not set
+
+In general key wont override.
+
+
+
+1.4.MSETNX key value [key value ...]
+constant value,once declared if you dont want to overwrite for multiple fields using the same command,not possible
+
+>msetnx id 1 course redis duration 3 days
+>mget id course duration
+
+>msetnx id 10: it wont update
+
+Return value
+Integer reply, specifically:
+
+1 if the all the keys were set.
+0 if no key was set (at least one key already existed).
+
+
+1.5.SETEX key seconds value
+Set key to hold the string value and set key to timeout after a given number of seconds.
+
+>setex name 10 subu
+name's value subu wont be available after 10s.
+
+
+
+1.5.PSETEX 
+works exactly like SETEX with the sole difference that the expire time is specified in milliseconds instead of seconds.
+
+>psetex name 10000 subu
+
+
+
+2.setting Numerical values
+>set counter 0
+>get counter
+0
+
+3.Numerical Operations
+ 
+3.1. INCR
+ Increments the number stored at key by one.
+ If the key does not exist, it is set to 0 before performing the operation. 
+ An error is returned if the key contains a value of the wrong type or contains a string that  can not be represented as integer. This operation is limited to 64 bit signed integers.
+
+Note: this is a string operation because Redis does not have a dedicated integer type. 
+The string stored at the key is interpreted as a base-10 64 bit signed integer to execute the operation.
+
+Use cases:
+1.Counter Pattern
+2.Rate Limiter Pattern
+
+
+>incr counter
+1
+
+3.2. INCR BY
+Increments the number stored at key by increment
+
+>incrby counter 5
+
+3.3.incrbyfloat counter .5
+
+3.4.DECR 
+Decrements the number stored at key by one. If the key does not exist, it is set to 0 before performing the operation.
+
+>decr counter 
+
+3.5.decrby 
+Decrements the number stored at key by decrement. 
+
+>decrby counter 2
+
+
+4.String operations
+
+4.1.STRLEN key
+   Returns the length of the string value stored at key.
+   An error is returned when key holds a non-string value.
+>strlen name
+
+4.2.Substring /GETRANGE
+Returns the substring of the string value stored at key, determined by the offsets start and end (both are inclusive). 
+
+>getrange name 0 10
+
+
+4.3.SETRANGE
+ Replace existing string values based on start and end 
+
+>Setrange name 10 geetha
+ setrange key offset value
+
+4.4.Append 
+ append string value on existing key
+If key already exists and is a string, this command appends the value at the end of the string. If key does not exist it is created and set as an empty string, so APPEND will be similar to SET in this special case.
+
+>append name murugan
+>get name
+"SubramanianMurugan"
+
+***********************//////////////////////*******************************************
+
+Bit Patterns:
+............
+
+bitmaps:
+BitMaps are  a data type used within Redis and represents a long list of bits that contain 0 by default and we can use SETBIT Command to flip to 1 or 0
+
+
+Key                    Value                               type
+	
+a_bitmap     0 0 0  0 0 0 0 0 0 0 0 0 0 0                  binary string
+
+bitmap can store up to 2pow 0f 32 bits,about 4 billion items
+
+Use case: login use case
+
+SETBIT logins:2017:04 6 1
+
+here login:2017:04 is key
+6 is offset , typically userid as offset
+1 is active bit
+
+SETBIT logins:2017:04 6 1
+
+
+
+
+
+

@@ -1,0 +1,372 @@
+Rabit -MQ : Middlewares
+
+Origins
+
+RabbitMQ is a “traditional” message broker that implements variety of messaging protocols. It was one of the first open source message brokers to achieve a reasonable level of features, client libraries, dev tools, and quality documentation. RabbitMQ was originally developed to implement AMQP, an open wire protocol for messaging with powerful routing features. While Java has messaging standards like JMS, it’s not helpful for non-Java applications that need distributed messaging which is severely limiting to any integration scenario, microservice or monolithic. With the advent of AMQP, cross-language flexibility became real for open source message brokers.
+
+
+Message Broker:
+	A message broker (also known as an integration broker or interface engine is an intermediary computer program module that translates a message from the formal messaging protocol of the sender to the formal messaging protocol of the receiver.
+
+Message brokers are elements in telecommunication or computer networks where software applications communicate by exchanging formally-defined messages
+
+Message brokers are a building block of message-oriented middleware (MOM) but are typically not a replacement for traditional middleware like MOM and remote procedure call (RPC).
+
+
+Message oriented Middlewares:
+.............................
+
+	Message-oriented middleware (MOM) is software or hardware infrastructure supporting sending and receiving messages between distributed systems. 
+
+	MOM allows application modules to be distributed over heterogeneous platforms and reduces the complexity of developing applications that span multiple operating systems and network protocols. 
+
+ 	The middleware creates a distributed communications layer that insulates the application developer from the details of the various operating systems and network interfaces. 
+	APIs that extend across diverse platforms and networks are typically provided by MOM.
+
+       This middleware layer allows software components (applications, Enterprise JavaBeans, servlets, and other components) that have been developed independently and that run on different networked platforms to interact with one another.
+
+
+Middleware categories
+......................
+
+1.Remote Procedure Call or RPC-based middleware
+2.Object Request Broker or ORB-based middleware
+3.Message Oriented Middleware or MOM-based middleware
+
+"In an RPC- or ORB-based system, when one procedure calls another, it must wait for the called procedure to return before it can do anything else"
+
+ "In these synchronous messaging models, the middleware functions partly as a super-linker, locating the called procedure on a network and using network services to pass function or method parameters to the procedure and then to return results".
+
+Advanced Message Queuing Protocol
+..................................
+
+	AMQP is the Internet Protocol for Business Messaging
+
+	"The Advanced Message Queuing Protocol (AMQP) is an open standard for passing business messages between applications or organizations."
+
+ It connects systems, feeds business processes with the information they need and reliably transmits onward the instructions that achieve their goals. 
+
+Key Capabilities
+AMQP connects across:
+
+Organizations – applications in different organizations
+Technologies – applications on different platforms
+Time – systems don’t need to be available simultaneously
+Space – reliably operate at a distance, or over poor networks
+
+	"https://www.amqp.org/about/what"
+
+What is RabbitMQ?
+
+RabbitMQ is message broker that accepts and  forwards messages.
+
+ You can think about it as a post office: 
+	When you put the mail that you want posting in a post box, 
+	You can be sure that Mr. or Ms. Mailperson will eventually deliver the mail to your         recipient.
+
+
+
+The major difference between RabbitMQ and the post office is that it doesn't deal with paper, instead it accepts, stores and forwards binary blobs of data ‒ messages.
+
+RabbitMQ, and messaging in general, uses some jargon.
+
+Producing means nothing more than sending. 
+   A program that sends messages is a producer :
+
+A queue 
+	It is the name for a post box which lives inside RabbitMQ. 
+	Messages are stored inside Queue.
+	Queue stores messages inside main memory and disk.
+	The size of the Queue is decided the Host Main memory and disk limit.
+	In General it is large memory buffer.
+        Many producers , can produce message and stores in a Queue.
+
+Consumers:
+        It is Program who consumes message from Queue.
+
+
+Note:
+  Producer,Consumer,Broker need not be in the same machine.
+
+HelloWorld : javascript : Producer
+
+
+var amqp = require('amqplib/callback_api');
+
+amqp.connect('amqp://localhost', function(error0, connection) {
+    if (error0) {
+        throw error0;
+    }
+    connection.createChannel(function(error1, channel) {
+        if (error1) {
+            throw error1;
+        }
+
+        var queue = 'hello';
+        var msg = 'Hello Subu';
+
+        channel.assertQueue(queue, {
+            durable: false
+        });
+        channel.sendToQueue(queue, Buffer.from(msg));
+
+        console.log(" [x] Sent %s", msg);
+    });
+    setTimeout(function() {
+        connection.close();
+        process.exit(0);
+    }, 500);
+});
+
+Check RabbitMq Management Console:
+.................................
+
+******************************************************************************************
+
+Types of Queue:
+
+1.Named Queue
+2.Work/Task Queue
+  The main idea behind Work Queues (aka: Task Queues) is to avoid doing a resource-intensive task immediately and having to wait for it to complete.
+
+Instead we schedule the task to be done later. We encapsulate a task as a message and send it to the queue.
+A worker process running in the background will pop the tasks and eventually execute the job. When you run many workers the tasks will be shared between them.
+
+...........................................................................................
+
+RabbitMQ Server Administration:
+  
+Components of RabbitMQ
+
+RabbitMQ Server
+RabbitMQ Plugins
+RabbitMQ Client Libs
+
+
+
+RabbitMQ Server:
+
+The RabbitMQ server is an implementation of an AMQP broker 
+It is written on the widely-used Erlang/Open Telecom Platform (OTP), an “always available‟ platform that has been in production use in carrier grade telcos since the late 1990s.
+
+The core server is unusually compact, with only 12,000 lines of code.
+Because RabbitMQ implements the open AMQP protocol, it is not necessary to know Erlang, and many users prefer to manage the broker using Java or Ruby.
+
+Pivotal RabbitMQ Plug-ins
+
+Pivotal RabbitMQ server is shipped with the following plug-ins. You enable, disable, and display them with the rabbitmq-plugins tool.
+
+amqp_client
+cowboy
+eldap
+mochiweb
+rabbitmq_amqp1_0
+rabbitmq_auth_backend_ldap
+rabbitmq_auth_mechanism_ssl
+rabbitmq_consistent_hash_exchange
+rabbitmq_federation
+rabbitmq_federation_management
+rabbitmq_jms_topic_exchange
+rabbitmq_management
+rabbitmq_management_agent
+rabbitmq_management_visualiser
+rabbitmq_mqtt
+rabbitmq_shovel
+rabbitmq_shovel_management
+rabbitmq_stomp
+rabbitmq_test
+rabbitmq_tracing
+rabbitmq_web_dispatch
+rabbitmq_web_stomp
+rabbitmq_web_stomp_examples
+sockjs
+webmachine
+
+
+RabbitMQ Client Libraries:
+.........................
+
+Pivotal RabbitMQ provides and commercially supports .NET and Java client libraries.
+The Erlang AMQP client is also available to all AMQP-compliant brokers, which includes RabbitMQ server.
+ 
+
+RabbitMQ Server features:
+
+1.Reliability: 
+	Pivotal RabbitMQ offers a variety of features to let you trade off performance with reliability, including persistence, delivery acknowledgements, publisher confirms, and high availability.
+
+2.Flexible routing :
+
+   Messages are routed through exchanges before arriving at queues. Pivotal RabbitMQ features several built-in exchange types for typical routing logic. For more complex routing you can bind exchanges together or even write your own exchange type as a plugin.
+
+3.Clustering :
+
+  Several Pivotal RabbitMQ servers on a local network can be clustered to form a single logical broker.
+
+4.Federation
+
+   Federation offers an alternative distributed messaging model for servers that need to be more loosely and unreliably connected than clustering allows.
+
+
+5.Highly Available Queues:
+
+   You can mirror queues across several machines in a cluster, ensuring that even in the event of hardware failure your messages are safe.
+
+6.Multi-protocol :
+ 
+  Pivotal RabbitMQ supports messaging over a variety of messaging protocols.
+
+7.Many Clients :
+
+ 	There are Pivotal RabbitMQ clients for almost any language you can think of.
+
+8.Management UI:
+ 
+	Pivotal RabbitMQ ships with an easy-to use management user interface that allows you to monitor and control every aspect of your message broker.
+
+10.Tracing :
+
+	If your messaging system is not working properly, you can use the tracing support to find out what’s going wrong.
+
+11.Plugin system :
+
+	 Pivotal RabbitMQ ships with a variety of plugins, extending it in different ways, and you can also write your own.
+
+............................................................................................
+
+Realibility:
+...........
+
+What can fail?
+
+Network problems are probably the most common class of failure.
+Not only can networks fail, firewalls can interrupt idle connections, and network failures are not always detected immediately.
+
+Connection Failures
+
+In the event of a connection failure, the client will need to establish a new connection to the broker. Any channels opened on the previous connection will have been automatically closed and these will need re-opening too.
+
+In general when connections fail, the client will be informed by the connection throwing an exception (or similar language construct).
+
+ The official Java and .NET clients additionally provide callback methods to let you hear about connection failures in other contexts - Java provides the ShutdownListener callback on both Connection and Channel classes, and .NET client provides IConnection.ConnectionShutdown and IModel.ModelShutdown events for the same purpose.
+
+
+
+Acknowledgements and Confirms:
+
+When a connection fails, messages may be in transit between client and server - they may be in the middle of being parsed or generated, in OS buffers, or on the wire.
+
+Messages in transit will be lost - they will need to be retransmitted.
+
+Acknowledgements let the server and clients know when to do this.
+
+Of course, TCP ensures that packets have been received, and will retransmit until they are - but that’s just the network layer.
+
+Acknowledgements and confirms indicate that messages have been received and acted upon.
+
+An acknowledgement signals both the receipt of a message, and a transfer of ownership where the receiver assumes full responsibility for it.
+
+Acknowledgements therefore have semantics
+ 
+a consuming application should not acknowledge messages until it has done whatever it needs to do with them - recorded them in a database, forwarded them on, printed them onto paper or anything else. Once it does so, the broker is free to forget about the message.
+
+Similarly, the broker will confirm messages once it has taken responsibility for them
+
+
+Use of acknowledgements guarantees at-least-once delivery. Without acknowledgements, message loss is possible during publish and consume operations and only at-most-once delivery is guaranteed.
+
+
+Heartbeats
+
+	In some types of network failure, packet loss can mean that disrupted TCP connections take some time to be detected by the operating system.
+
+	AMQP offers a heartbeat feature to ensure that the application layer promptly finds out about disrupted connections (and also completely unresponsive peers).
+
+	Heartbeats also defend against certain network equipment which may terminate “idle” TCP connections
+
+
+
+At the Broker:
+
+	In order to avoid losing messages in the broker we need to cope with broker restarts, broker hardware failure and in extremis even broker crashes.
+
+	To ensure that messages and broker definitions survive restarts, we need to ensure that they are on disk. 
+
+	The AMQP standard has a concept of durability for exchanges, queues and of persistent messages, requiring that a durable object or persistent message will survive a restart. More details about specific flags pertaining to durability and persistence can be found in the AMQP Concepts Guide.
+
+Clustering and High Availability:
+................................
+
+A.If we need to ensure that our broker survives hardware failure, we can use RabbitMQ’s clustering.
+
+B.In a RabbitMQ cluster, all definitions (of exchanges, bindings, users, etc) are mirrored across the entire cluster. 
+
+C.Queues behave differently, by default residing only on a single node,but optionally being mirrored across several or all nodes. 
+
+Queues remain visible and reachable from all nodes regardless of where they are located.
+
+Mirrored queues replicate their contents across all configured cluster nodes, tolerating node failures seamlessly and without message loss.
+
+However, consuming applications need to be aware that when queues fail their consumers will be cancelled and they will need to reconsume
+
+
+At the Producer
+
+	When using confirms, producers recovering from a channel or connection failure should retransmit any messages for which an acknowledgement has not been received from the broker.
+
+	There is a possibility of message duplication here, because the broker might have sent a confirmation that never reached the producer (due to network failures, etc).
+
+
+Ensuring Messages are Routed
+
+In some circumstances it can be important for producers to ensure that their messages are being routed to queues
+
+1.To ensure messages are routed to a single known queue, the producer can just declare a destination queue and publish directly to it. 
+
+2. If messages may be routed in more complex ways but the producer still needs to know if they reached at least one queue, it can set the mandatory flag on a "basic.publish".
+
+3.ensuring that a basic.return (containing a reply code and some textual explanation) will be sent back to the client if no queues were appropriately bound
+
+4.Producers should also be aware that when publishing to a clustered node, if one or more destination queues that are bound to the exchange have mirrors in the cluster
+
+5.it’s possible to incur delays in the face of network failures between nodes, due to flow control between replicas and the master queue process. 
+
+
+At the Consumer
+
+In the event of network failure (or a node crashing), messages can be duplicated, and consumers must be prepared to handle them. If possible, the simplest way to handle this is to ensure that your consumers handle messages in an idempotent way rather than explicitly deal with deduplication.
+
+
+If a message is delivered to a consumer and then requeued (because it was not acknowledged before the consumer connection dropped, for example) then RabbitMQ will set the redelivered flag on it when it is delivered again (whether to the same consumer or a different one).
+
+This is a hint that a consumer may have seen this message before (although that’s not guaranteed, the message may have made it out of the broker but not into a consumer before the connection dropped).
+
+Conversely if the redelivered flag is not set then it is guaranteed that the message has not been seen before. Therefore if a consumer finds it more expensive to deduplicate messages or process them in an idempotent manner, it can do this only for messages with the redelivered flag set.
+
+
+Consumer Cancel Notification
+
+Under some circumstances the server needs to be able to cancel a consumer - since the queue it was consuming from has been deleted, or has failed over.
+
+In this case the consumer should consume again but be aware that it may see messages again which it has already seen.
+
+Note that consumer cancel notification is a RabbitMQ extension to AMQP, and as such may not be supported by all clients.
+
+Messages That Cannot Be Processed
+
+If a consumer determines that it cannot handle a message then it can reject it using basic.reject (or basic.nack), either asking the server to requeue it, or not (in which case the server might be configured to dead-letter it instead.
+
+
+
+Distributed RabbitMQ
+  Rabbit provides two plugins to assist with distributing nodes over unreliable networks: federation and the shovel. 
+
+  Both are implemented as AMQP clients, so if you configure them to use confirms and acknowledgements, they will retransmit when necessary. Both will use confirms and acknowledgements by default.
+
+
+
+
+
+
+
+

@@ -1,0 +1,30 @@
+Redis store structure
+
+--------------------------------------------------------------
+>set some_key some_Value
+>lpush a_list a_value an_anothervalue 
+
+Key           Value              type
+some_key      some_value         string
+a_list        [a_value
+              an_anothervalue]    List
+
+bitmaps:
+BitMaps are  a data type used within Redis and represents a long list of bits that contain 0 by default and we can use SETBIT Command to flip to 1 or 0
+
+
+Key                    Value                               type
+	
+a_bitmap     0 0 0  0 0 0 0 0 0 0 0 0 0 0                  binary string
+
+bitmap can store up to 2pow 32 bits,about 4 billion items
+
+Use case: login use case
+
+SETBIT logins:2017:04 6 1
+
+here login:2017:04 is key
+6 is offset , typically userid as offset
+1 is active bit
+
+SETBIT logins:2017:04 6 1

@@ -1,0 +1,332 @@
+RabbitMQ Architectural Components:
+
+1.Vhost
+
+Virtual hosts are administrative containers,they allow to configure many logically
+independent brokers hosts within one single RabbitMQ instance.
+
+1.One RabbitMQ Instance can have multiple vhost. default host is /
+2.One single rabbitmq server can be shared among different set of applications(publishers/consumers).
+
+Each vHost contains
+1.connection
+2.Queue
+3.Topic
+4.Exchange
+5.Users and permissions
+
+
+Queue:
+
+1.It is a datastructure, where messages are stored inside rabbitmq.
+
+2.They store the messages in a First-In-First-Out (FIFO) way that is well
+ defined in the queue data structure.
+
+ Note:
+	"Different from Queue data structure, if multiple
+readers from a queue is active, then one of the reader sometimes has a priority over
+another. Then, prior one takes the message before the other readers. Therefore,
+message queue in AMQ model is called as weak-FIFO."
+
+3.How many queues you can have on single rabbitmq server?
+  Many Queues
+
+4.Every Queue can publish and consume messages concurrently.
+
+
+Properties of Message queue:
+
+1.Name:
+	Defines the name of Message Queue
+1.Queues have names so that applications can reference them.
+2.Applications may pick queue names or ask the broker to generate a name for them. Queue names may be up to 255 bytes of UTF-8 characters.
+
+3.Queue names starting with "amq." are reserved for internal use by the broker. 
+   if you keep queue name "amq.test" like ,it will through error. "reply code 403 (ACCESS_REFUSED".
+
+4.In Client Application if queue name not mentioned,("empty string")
+   Broker  can generate a unique queue name on behalf of an app
+
+
+life of Queue: Queue deletion
+..............
+
+"With some workloads queues are supposed to be short lived. While clients can delete the queues they declare before disconnection, this is not always convenient. On top of that, client connections can fail, potentially leaving unused resources (queues) behind."
+
+
+1.Durablity: 
+  durable
+   If set, the Message Queue can't lose any message (the queue will survive a broker restart)
+  trainsent
+     if broker restarts, the queue will be deleted.
+   
+Lab: Create Queue
+Name demo.queue
+Durablity: durable /trainsent
+
+Test with durable property and restart broker
+
+$sudo service rabbitmq-server restart
+
+2.auto delete:Yes | No
+
+
+"An auto-delete queue will be deleted when its last consumer is cancelled (e.g. using the basic.cancel in AMQP 0-9-1) or gone (closed channel or connection, or lost TCP connection with the server)."
+
+ If yes, the queue will delete itself after at least one consumer has connected, and then all  consumers have disconnected.
+
+Lab:
+
+Create Queue :
+name :demo.queue
+durability: durable / traninsent
+auto delete:true.
+
+publish simple hello message.
+
+Write consumer js program 
+consumer.js
+var amqp = require('amqplib/callback_api');
+
+amqp.connect('amqp://localhost', function(error0, connection) {
+    if (error0) {
+        throw error0;
+    }
+    connection.createChannel(function(error1, channel) {
+        if (error1) {
+            throw error1;
+        }
+
+        var queue = 'demo.queue';
+
+        channel.assertQueue(queue, {
+            durable: true,
+            autoDelete:true
+        });
+
+        console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", queue);
+
+        channel.consume(queue, function(msg) {
+            console.log(" [x] Received %s", msg.content.toString());
+        }, {
+            noAck: true
+        });
+    });
+});
+
+Steps to reproduce auto delete:
+
+1.from browser publish message and see the consumer console window.
+2.press ctrl+c to disconnect consumer, notedown the queue was deleted in the browser.
+
+
+
+3.Exclusive Queues:
+-------------------
+ An exclusive queue can only be used (consumed from, purged, deleted, etc) by its declaring connection.
+
+An attempt to use an exclusive queue from a different connection will result in a channel-level exception RESOURCE_LOCKED with an error message that says cannot obtain exclusive access to locked queue.
+
+
+code :
+
+Take from previous one and just modify
+   var queue = 'demo.queue';
+
+        channel.assertQueue(queue, {
+            durable: true,
+            exclusive:true
+        });
+
+Lab:
+1.open browser keep ready for publishing message
+2.run the above code one by one  in two different terminal
+
+ $node src/consumer.js
+ 
+publish message and watch, 
+
+$node src/consumer.js
+
+now you can see error message in the second  terminal
+
+again go to terminal 1 , press ctrl + c , watch queue is deleted.
+
+Exclusive  vs auto delete:
+..........................
+
+1.Exclusive  can allow only one consumer, if he dies, queue will be deleted.
+2.auto delete can allow many consumer, waits for last consumer dies,then queue will be deleted.
+
+**********************/****************************************************************
+
+Args:
+Time-to-Live and Length Limit
+
+
+Queues can have their length limited. Queues and messages can have a TTL.
+
+RabbitMQ allows you to set TTL (time to live) for both messages and queues.
+
+how to set values
+
+1. optional queue arguments 
+2. policies 
+
+Points:
+
+1.While much of the configuration for RabbitMQ lives in the configuration file, some things do not mesh well with the use of a configuration file:
+
+If they need to be the same across all nodes in a cluster
+If they are likely to change at run time
+
+RabbitMQ calls these items parameters.
+	Parameters can be set by invoking rabbitmqctl
+	through the management plugin's HTTP API.
+
+There are 2 kinds of parameters: vhost-scoped parameters and global parameters. 
+
+Vhost-scoped parameters are tied to a virtual host and consist of a component name, a name and a value. 
+
+Global parameters are not tied to a particular virtual host and they consist of a name and value.
+
+Global and Per-vhost Parameters:
+
+rabbitmqctl set_parameter [-p vhost] <component_name> <name> <value>
+rabbitmqctl clear_parameter [-p vhost] <component_name> <name>
+rabbitmqctl list_parameters [-p vhost]
+
+Policy:
+
+Clients can send parameters 
+Parameters can be set using set_parameter
+but some time it would be very complex, so we need policies
+
+
+rabbitmqctl set_policy federate-me \
+    "^amq\." '{"federation-upstream-set":"all"}' \
+    --priority 1 \
+    --apply-to exchanges
+
+Reference:https://www.rabbitmq.com/parameters.html#parameter-management
+........................................................................................
+
+Exchange: 
+
+Messages are not published directly to a queue; instead, the producer sends a
+message to an exchange. The job of an exchange is to accept messages from the producer
+applications and route them to the correct message queues. It does this with the help
+of bindings and routing keys. A binding is a link between a queue and an exchange
+
+Message Flow in RabbitMQ
+1. The producer publishes a message to an exchange. When creating an
+exchange, its type must be specified.
+
+2. The exchange receives the message and is now responsible for the routing
+of the message. The exchange looks at different message attributes and
+keys depending on the exchange type.
+
+
+3. In this case, we see two bindings to two different queues from the exchange.
+The exchange routes the message to the correct queue, depending on these
+attributes.
+
+4. The messages stay in the queue until the consumer processes them.
+
+5. The consumer then removes the message from the queue once handled.
+
+see Image:Queue-ExchangeFlow
+.......................................................................................
+
+Types of Exchanges: Refer RoutingTypes imgage.
+..................
+
+Exchange - Receives messages from producers and pushes them to queues
+depending on rules defined by the exchange type. A queue needs to be bound
+to at least one exchange to be able to receive messages.
+
+• Binding - Link between a queue and an exchange
+• Routing Key - The key that the exchange looks at to decide how to route the
+message to queues. Think of the routing key as the destination address of a
+message.
+
+Direct:
+
+ A direct exchange delivers messages to queues based on a message
+routing key.
+In a direct exchange, the message is routed to the queue with the
+exact match of binding key as the routing key of the message.
+
+For example,
+if the queue is bound to the exchange using the binding key ‘pdfprocess’, a
+message published to the exchange with a routing key ‘pdfprocess’ is routed
+to that queue.
+
+Lab : publish message to Exchange based on routing key.
+
+Steps:
+
+1.Create Exchange in the management console.
+
+name : pdfprocessexchange.
+type : direct
+
+
+2.create queue 
+pdfprocessqueue
+
+2.1.define bindings of the queue
+  exchange
+  routingkey
+
+
+3.send message to exchange
+var amqp = require('amqplib/callback_api');
+
+amqp.connect('amqp://localhost', function(error0, connection) {
+    if (error0) {
+        throw error0;
+    }
+    connection.createChannel(function(error1, channel) {
+        if (error1) {
+            throw error1;
+        }
+        var exchange = 'pdfprocessexchange';
+        var msg = 'Pdf Processing';
+        var key = 'pdfprocess'
+        channel.assertExchange(exchange, 'direct', {
+            durable: true
+        });
+        channel.publish(exchange, key, Buffer.from(msg));
+        console.log(" [x] Sent %s: '%s'", key, msg);
+    });
+
+    setTimeout(function() {
+        connection.close();
+        process.exit(0);
+    }, 500);
+});
+
+
+Topic - The topic exchange performs a wildcard match between the routing
+key and the routing pattern specified in the binding.
+• Fanout - A fanout exchange routes messages to all of the queues that are
+bound to it.
+• Headers - A header exchange uses the message header attributes for routing
+purposes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

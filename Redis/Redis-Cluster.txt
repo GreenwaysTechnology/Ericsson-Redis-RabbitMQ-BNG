@@ -1,0 +1,13 @@
+Redis-Cluster:
+
+Key Terminalogy:
+
+Slots:
+
+You can consider slot as its literal meaning, just like slots in the real world.
+
+Every key belongs to a certain slot by some rules. And a slot also belongs to a certain redis node by config.
+
+Hash slots are defined by Redis so the data can be mapped to different nodes in the Redis cluster. The number of slots (16384 ) can be divided and distributed to different nodes.
+
+For example, in a 3 node cluster one node can hold the slots 0 to 5640, next 5461 to 10922 and the third 10923 to 16383. Input key or a part of it is hashed (run against a hash function) to determine a slot number and hence the node to add the key to.

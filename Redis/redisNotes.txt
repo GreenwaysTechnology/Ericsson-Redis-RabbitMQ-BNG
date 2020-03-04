@@ -1,0 +1,199 @@
+Key-Value Databases:
+......................
+
+What is it?
+
+  It is distributed hash table,it is Way for you to store simple objects,blobs  or what ever it across a cluster of machines and what  the cluster does is it provides all the maintainence and fail over for you so that you really can store an enormous number of records with extermely low latencies keep key-value stores actually the simplest thing to describe if you have a piece of data , you give it a name and you store it , its actually not that different from  how you would store files on a file system, the advantage of key-value store is it does  this massively distributed way where the nodes themselves  can handle failures and data is replicated now what interesting about key-value  stores is that these systems are designed to have to handle truly massive amounts of traffic,so test with our major key value stores vendors like couchbase ,redis, can handle transaction volumes into millions of records per second,millions of operations per second that's some thing they were able to do without too much trouble
+
+........................................................................
+Key---Value
+
+eg:
+tweeterId --->information about tweet
+itemno--->information about items
+flightno--->information about flights
+accountNo--->information about accounts
+
+It is dictionary data structure
+  ->insert,lookup, and delete key
+  ->hash table,binary tree
+But distriuted
+Sound familar? Remember distriuted hash tables (DHT)in p2p systems
+
+https://wiki.p2pfoundation.net/Distributed_Hash_Table
+
+  Redis is an open source (BSD licensed), in-memory data structure store, used as a database, cache and message broker. It supports data structures such as strings, hashes, lists, sets, sorted sets with range queries, bitmaps, hyperloglogs, geospatial indexes with radius queries and streams. Redis has built-in replication, Lua scripting, LRU eviction, transactions and different levels of on-disk persistence, and provides high availability via Redis Sentinel and automatic partitioning with Redis Cluster.
+
+You can run atomic operations on these types, like appending to a string; incrementing the value in a hash; pushing an element to a list; computing set intersection, union and difference; or getting the member with highest ranking in a sorted set.
+
+In order to achieve its outstanding performance, Redis works with an in-memory dataset. Depending on your use case, you can persist it either by dumping the dataset to disk every once in a while, or by appending each command to a log. Persistence can be optionally disabled, if you just need a feature-rich, networked, in-memory cache.
+
+Redis also supports trivial-to-setup master-slave asynchronous replication, with very fast non-blocking first synchronization, auto-reconnection with partial resynchronization on net split.
+
+Transactions
+Pub/Sub
+Lua scripting
+Keys with a limited time-to-live
+LRU eviction of keys
+Automatic failover
+
+Redis is written in ANSI C and works in most POSIX systems like Linux, *BSD, OS X without external dependencies. Linux and OS X are the two operating systems where Redis is developed and tested the most, and we recommend using Linux for deploying. Redis may work in Solaris-derived systems like SmartOS, but the support is best effort. There is no official support for Windows builds.
+
+
+redis is not a plain key-value store, it is actually a data structures server, supporting different kinds of values. What this means is that, while in traditional key-value stores you associated string keys to string values, in Redis the value is not limited to a simple string, but can also hold more complex data structures. The following is the list of all the data structures supported by Redis, which will be covered separately in this tutorial:
+
+
+Binary-safe strings.
+
+Lists: collections of string elements sorted according to the order of insertion. They are basically linked lists.
+
+Sets: collections of unique, unsorted string elements.
+
+Sorted sets, similar to Sets but where every string element is associated to a floating number value, called score. The elements are always taken sorted by their score, so unlike Sets it is possible to retrieve a range of elements (for example you may ask: give me the top 10, or the bottom 10).
+
+
+Hashes, which are maps composed of fields associated with values. Both the field and the value are strings. This is very similar to Ruby or Python hashes.
+
+Bit arrays (or simply bitmaps): it is possible, using special commands, to handle String values like an array of bits: you can set and clear individual bits, count all the bits set to 1, find the first set or unset bit, and so forth.
+
+HyperLogLogs: this is a probabilistic data structure which is used in order to estimate the cardinality of a set. Don't be scared, it is simpler than it seems... See later in the HyperLogLog section of this tutorial.
+
+Streams: append-only collections of map-like entries that provide an abstract log data type. They are covered in depth in the Introduction to Redis Streams.
+
+It's not always trivial to grasp how these data types work and what to use in order to solve a given problem from the command reference, so this document is a crash course to Redis data types and their most common patterns.
+
+For all the examples we'll use the redis-cli utility, a simple but handy command-line utility, to issue commands against the Redis server.
+......................................................................
+
+Redis data types:
+
+1.Strings:
+
+The Redis String type is the simplest type of value you can associate with a Redis key
+It is the only data type in Memcached, so it is also very natural for newcomers to use it in Redis.
+
+Since Redis keys are strings, when we use the string type as a value too, we are mapping a string to another string. The string data type is useful for a number of use cases, like caching HTML fragments or pages.
+
+Redis uses commands for storing data,processing data,reterving data
+
+storing data:
+
+>SET KEY VALUE
+
+
+SET key value [EX seconds|PX milliseconds] [NX|XX]
+
+Set key to hold the string value. If key already holds a value, it is overwritten, regardless of its type. Any previous time to live associated with the key is discarded on successful SET operation.
+
+Options
+Starting with Redis 2.6.12 SET supports a set of options that modify its behavior:
+
+EX seconds -- Set the specified expire time, in seconds.
+PX milliseconds -- Set the specified expire time, in milliseconds.
+NX -- Only set the key if it does not already exist.
+XX -- Only set the key if it already exist.
+
+Note: Since the SET command options can replace SETNX, SETEX, PSETEX, it is possible that in future versions of Redis these three commands will be deprecated and finally removed
+
+eg:
+
+>redis-cli
+
+>SET firstName "Subramanian"
+
+Return value
+Simple string reply: OK if SET was executed correctly. Null reply: a Null Bulk Reply is returned if the SET operation was not performed because the user specified the NX or XX option but the condition was not met.
+
+
+GET key
+
+
+Get the value of key. If the key does not exist the special value nil is returned. An error is returned if the value stored at key is not a string, because GET only handles string values.
+
+
+>GET firstName 
+"Subramanian"
+Bulk string reply: the value of key, or nil when key does not exist.
+
+
+
+Note: keys are case sensitive.
+
+
+As you can see using the SET and the GET commands are the way we set and retrieve a string value. Note that SET will replace any existing value already stored into the key, in the case that the key already exists, even if the key is associated with a non-string value. So SET performs an assignment.
+
+Values can be strings (including binary data) of every kind, for instance you can store a jpeg image inside a value. A value can't be bigger than 512 MB.
+
+..................................................................
+
+Append:
+
+APPEND key value
+
+If key already exists and is a string, this command appends the value at the end of the string.
+
+redis> EXISTS mykey
+(integer) 0
+redis> APPEND mykey "Hello"
+(integer) 5
+redis> APPEND mykey " World"
+(integer) 11
+redis> GET mykey
+"Hello World"
+redis> 
+
+
+Pattern: Time series
+The APPEND command can be used to create a very compact representation of a list of fixed-size samples, usually referred as time series. Every time a new sample arrives we can store it using the command
+
+
+STRLEN can be used in order to obtain the number of samples.
+
+GETRANGE allows for random access of elements. If our time series have associated time information we can easily implement a binary search to get range combining GETRANGE with the Lua scripting engine available
+
+SETRANGE can be used to overwrite an existing time series.
+
+//////////////////////////////////////////////////////////////////////
+Bit Count:
+............
+
+Count the number of set bits (population counting) in a string.
+
+By default all the bytes contained in the string are examined
+
+
+Bit Map,Bit Set:
+
+Bitmap (aka Bitset)
+
+A Bitmap or bitset is an array of zeros and ones.
+
+A bit in a bitset can be set to either 0 or 1, and each position in the array is referred to as an offset
+
+Operations such as logical AND, OR, XOR, etc. and other bitwise operations are fair game for Bitmaps.
+
+Bitmaps in Redis
+
+Redis allows binary keys and binary values. Bitmaps are nothing but binary values
+
+
+ANALYTICS USING REDIS DATA STRUCTURE:BITMAP.
+............................................
+
+"Chances are, if you have ever worked on a highly trafficked website, you may have a need for real time metrics.Whether it be counting the number of times all users have clicked a button or figuring out how many distinct actions an user has performed."
+
+Theoretical scenario
+Lets say you run an e-commerce website and you want to
+
+See how many users have clicked a certain button or performed a certain action. Example actions, could be how many times has someone performed the internal search action(clicked the search button) on the site. How many times have customers clicked add to cart button in the last hour and such.
+Track if a customer has performed a certain set of actions, for e.g if they clicked on the search button, gone to a certain page, gone to the home page etc.
+Track how many users have performed a particular action or a set of actions.
+Redis bitmaps are super simple way to track user events.
+
+Redis bitmaps are not a special datatype in REDIS but is a String datatype in redis which has its value set by the SETBIT SETBIT operation. This value can be retrieved by the GETBIT operation.
+
+Redis bitmaps are not a special datatype in REDIS but is a String datatype in redis which has its value set by the SETBIT SETBIT operation. This value can be retrieved by the GETBIT operation.
+
+Bitmaps are a collection of bits 1 representing an action that has been taken by the customer and 0 representing no action, with the offset as the customer id
+
+SETBIT MYKEY 1

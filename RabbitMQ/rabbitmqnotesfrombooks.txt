@@ -1,0 +1,174 @@
+RabbitMQ is lightweight and extermely powerful tool for creating distributed software architectures 
+
+RabbitMQ features and benefits:
+...............................
+
+1.Open source;
+   RabbitMQ is opensource project developed between LShift, LTD, and
+Cohesive FT as RabbitMQ Technologies, RabbitMQ is now owned by Pivotal Software
+Inc. and is released under the Mozilla Public License.
+
+2.Platform and vendor neutral
+
+3.Lightweight
+
+4.Client libraries for most modern languages
+
+5.Flexibility in controlling messaging trade-offs
+
+6.Third-party plugins
+
+7.Layers of security
+
+RabbitMQ and Erlang:
+
+	It was written in Erlang, the telco-grade, functional
+programming language designed at the Ericsson Computer Science Laboratory
+in the mid-to-late 1980s.
+
+Erlang was designed to be a distributed, fault-tolerant, soft
+real-time system for applications that require 99.999% uptime. As a language and runtime
+system, Erlang focuses on lightweight processes that pass messages between each
+other
+
+RabbitMQ and AMQP :
+
+Adanced Messing Queue Protocal  is the opensource messaging protocal.
+
+The RabbitMQ is the first Message Broker which implements AMQP.
+
+Rabbit MQ supports other protocals such as STOMP(The Simple Text Oriented Messaging Protocol
+
+)
+
+Why RabbitMQ differs from other Brokers?
+As with AMQP, RabbitMQ set out to
+be a vendor-neutral, platform-independent solution for the complex needs that messaging
+oriented architectures demand, such as flexible message routing, configurable
+message durability, and inter-datacenter communication
+
+Who’s using RabbitMQ, and how?
+Reddit
+NASA chose RabbitMQ to be the message broker for their Nebula platform
+RabbitMQ sits at the core of Agoura Games’
+the Ocean Observations Initiative,
+Rapportive, a Gmail add-on
+MercadoLibre
+Google’s AdMob mobile advertising network
+India’s biometric database system, Aandhaar leverages RabbitMQ
+
+
+Erlang basics :
+
+Erlang is functional,distributed,concurrent programming language.
+
+Erlang has been designed to build highly available, concurrent applications.
+
+Erlang and Distributed Programming:
+...................................
+
+ "The distributed Erlang implementation provides a very basic authentication mechanism to prevent unintentional access to an Erlang system on another computer. Erlang systems which talk to each other must have the same magic cookie."
+
+"The easiest way to achieve this is by having a file called .erlang.cookie in your home directory on all machines on which you are going to run Erlang systems communicating with each other".
+
+On Windows systems the home directory is the directory pointed out by the environment variable $HOME - you may need to set this.
+On Linux or UNIX you can safely ignore this and simply create a file called .erlang.cookie in the directory you get to after executing the command cd without any argument.
+
+The .erlang.cookie file is to contain a line with the same atom. For example, on Linux or UNIX, in the OS shell:
+
+$ cd
+$ cat > .erlang.cookie
+this_is_very_secret
+$ chmod 400 .erlang.cookie
+The chmod above makes the .erlang.cookie file accessible only by the owner of the file. This is a requirement.
+
+When you start an Erlang system that is going to talk to other Erlang systems, you must give it a name, for example:
+
+$erl -sname my_name
+
+We will see more details of this later. If you want to experiment with distributed Erlang, but you only have one computer to work on, you can start two separate Erlang systems on the same computer but give them different names. Each Erlang system running on a computer is called an Erlang node.
+..............................***********...................................................
+
+RabbitMQ Strengths:
+
+including its flexibility, come from the AMQP specification.
+
+Note: AMQP Implementations
+   RabbitMQ,OpenAMQ,StormMQ,Apache Qpid,Red Hat Enterprise MRG
+
+
+Unlike protocols like HTTP and SMTP, the AMQP specification defines not only a network protocol but also server-side services and behaviors
+
+The AMQ model logically defines three abstract components in broker software that define the routing behavior of messages:
+
+
+Exchange—The component of the message broker that routes messages to queues
+Queue—A data structure on disk or in memory that stores messages
+Binding—A rule that tells the exchange which queue the messages should be
+stored in.
+
+
+Sender--send messages-----|Exchange-----binding----Queue-------Consumer.
+
+
+ "The flexibility of RabbitMQ comes from the dynamic nature of how messages can be
+routed through exchanges to queues. The bindings between exchanges and queues,
+and the message routing dynamics they create, are a foundational component of
+implementing a messaging-based architecture"
+
+
+
+Exchange:
+........
+
+1.Exchanges are one of three components defined by the AMQ model.
+2.An exchange receives messages sent into RabbitMQ and determines where to send them.
+3.Exchanges define the routing behaviors that are applied to messages, usually by examining   data attributes passed along with the message or that are contained within the message’s
+  properties
+4.RabbitMQ has multiple exchange types, each with different routing behaviors
+
+
+Queue:
+A queue is responsible for storing received messages 
+may contain configuration information that defines what it’s able to do with a message
+A queue may hold messages
+in RAM only, or it may persist them to disk prior to delivering them in first-in,
+first-out (FIFO) order.
+
+Bindings:
+
+To define a relationship between queues and exchanges, the AMQ model defines a
+binding.
+In RabbitMQ, bindings or binding keys, tell an exchange which queues to deliver
+messages to. For some exchange types, the binding will also instruct the exchange to
+filter which messages it can deliver to a queue.
+
+When publishing a message to an exchange, applications use a routing-key attribute.
+This may be a queue name or it may be a string that semantically describes the
+message.
+When a message is evaluated by an exchange to determine the appropriate
+queues it should be routed to, the message’s routing key is evaluated against the binding
+key.
+In other words, the binding key is the glue that binds a queue to an
+exchange, and the routing key is the criteria that’s evaluated against it.
+
+Bindings Key:
+
+1.Mostly binding key would be Queue "name',it may be different based on exchange type.
+
+In RabbitMQ, each exchange type is likely to treat
+routing keys in a different way, with some exchanges invoking simple equality checks
+and others using more complex pattern extractions from the routing key. There’s
+even an exchange type that ignores the routing key outright in favor of other information
+in the message properties
+
+Note: 
+
+RabbitMQ extends not only exchange to queue bindings but also Exchange to exchange bindings.
+
+
+
+
+
+
+

@@ -1,0 +1,1282 @@
+
+Redis Lab
+
+1.Oracle VM
+2.Ubuntu
+3.Redis
+
+ubuntu
+
+>sudo apt-get update
+
+redis installed as binary directly.
+redis installed from source
+
+$ wget http://download.redis.io/releases/redis-5.0.7.tar.gz
+$ tar xzf redis-5.0.7.tar.gz
+$ cd redis-5.0.7
+$ make
+
+->Compile from the source
+
+
+Start Redis Server?
+
+redis-5.0.7/src$ ./redis-server
+  -The server starts with default settings
+
+if you want to pass some command line args
+
+./redis-server --options
+
+eg:
+redis-5.0.7/src$ ./redis-server --port 7777
+........................................................................................
+
+What is Redis?
+
+ Redis stands for REmote DIctionary Server.
+
+Remote- Distributed
+Dictionary - 
+  Data Structure
+      Organization of data based on structure.
+      
+  Objective :
+    - Store - write
+    - Process
+    - Report -read
+
+  Store:
+     1.Peristent : Permanent
+       -Disk store
+          -Files
+             -Structured
+                    -Database Management System.
+			 -SQL-----------------------Reading,Processing,Write
+             -Unstructured
+                    -NOSQL Movement
+		    -Big Data
+     2.In Memory : not permant
+
+ In Memory Data Structure
+  
+   Storing data inside RAM
+   Read data from RAM
+   Processing data from RAM.
+
+ Types of Data Structure
+  1.single dimension
+     Array
+        -Collection of data
+            -Ordered based on index
+            -index is location (memory address)
+       Subsets of Array
+	 -List : Dynamic Data Structure
+           SubSet of List
+		-LinkedList
+                -Stack
+                -Queue
+                -Set
+                  -SortedSet
+  2.two dimension
+       Key-Value Pair
+   
+   Dictionary
+      Other Names
+     ->Hashtable
+     ->Map
+
+OS Terminally.
+ 
+  Program : Collection of Instructions
+                -Variables and methods(commands/actions/procedure/functions)
+    
+   -Passive Program :source code
+          The program which is disk
+   -Active Program : binary image
+          The Program which is RAM :Process
+   The step of moving program from disk to ram is called Process creation.
+
+Redis is c Program, Redis is written in C language.
+
+Redis offer one program called redis-server.c is source code ;passive 
+Redis offer one program called redis-server ; active program.
+
+
+The Runtime:
+
+  Runtime is a program helps to run Application (Which is itself is program)
+
+ Every program runs on runtime only
+
+Roles of Runtime:
+ 1.Memory Allocation 
+ 2.Resource Management
+ 3.Low level api communication
+
+                   Application
+                      |
+                    Runtime
+                      |
+                     os
+                      |
+                     HAL
+                      |
+                     Hardware
+  
+Redis-Server is application which is running on "Redis-Runtime"
+
+Remote Dictionary Server
+
+
+Distributed
+
+		
+		 ----------------------------------
+		 Data(is represented using a DataStucture called dictionary)		
+		 ----------------------------------
+                 RedisServer-1        RedisServer-2
+                      |                   |
+                    Runtime ----talks-----Runtime
+                      |                    |
+                     os                   os
+                      |                    |
+                     HAL                  HAL
+                      |                    |
+                     Hardware            Hardware
+
+
+..............................................................................................
+
+Redis is nosql Database.
+
+Types of NoSql database
+- Key-Value
+- Document 
+- Column Family
+- Graph 
+
+-MultiModel
+
+
+Relational databse stores data in the form of tables(columns +rows)
+
+ Column is a mapper for storing data.
+
+In Relational model : schema(plan) is fixed.
+
+NoSql schema is dynamic/flexible.
+
+Redis is at core level is KEY-VALUE database.
+
+Redis can be fine tuned for other patterns like document oriented
+  Redis can be used like mongo.
+
+ Redis has concept called "Redis Modules" which is plugable architecture , where we can plug
+ Modules on top of redis to extends Redis core functionality.
+
+
+"Redis is a multimodel database enabling search, messaging, streaming, graph,
+and other capabilities beyond that of a simple data store"
+
+
+
+RedisModules:
+
+->RedisSearch - fast searching patterns
+->RedisGraph - Graph db pattern 
+->RedisJSON - Document oriented pattern
+->pub-Sub- Message Queue
+->Streaming - storing stream based data.
+
+Note: You can create your own modules,custom modules and can be integrated with Redis.
+
+...........................*..............................................................
+
+Where redis stores data?
+
+ Redis was developed to store data inside RAM Only. so that redis is called as "IN memory".
+ 
+What about machine restarts after storing data?
+   All data will be lost.
+
+What about duablity?
+
+ Redis has concept persistency
+
+ Redis stores /takes snapshot of data inside disk file called "fileName.rdb" or "fileName.aof"
+
+
+Redis server is program, which can be started without any input- redis starts with default configuration.
+
+Redis high level configuration:
+
+ Redis offers lot of configuration files
+
+->redis-conf
+->sentinel.conf
+
+
+redis-conf:
+...........
+
+Category:
+
+1.network
+2.genernal
+  databases 16
+3.snapshot
+4.Replication
+5.Security
+6.clients
+7.Memory Management
+8.Lazy freeing
+9.AOF Mode 
+10.Lua scripting
+11.High Availablity
+    ->Cluster
+    ->Cluster with Docker/NAT
+12.Slow Log
+13.Latency Monitor
+14.Messaging
+    ->Event Notification
+15.Advanced config
+
+Note:
+
+   How redis server can be extended
+  
+ 1.Via config file
+     redis.config
+      port 7777
+ 2.Via Commandline
+      $redis-server --port 7777
+ 
+
+Note:
+ Redis stores data inside heap memory of redis process, in turn they maintain structure called
+ "redis-database" which is memory layout for storing key-values
+
+ by default redis offers 16 segment of database.
+
+ Which can be selected by using a command "select" from redis cli
+
+ $ select 1
+ $ select 10
+
+
+snapshot: Persistency
+
+..............................................................................................
+
+Programming with Redis:
+......................
+ Redis stores data in memory using data structure.
+
+Data is stored inside redis using data type like rdbms sql column types.
+
+sql 
+
+ create table customer(id number,name varchar2(10);
+
+in redis key-value
+
+key has type
+
+value has type
+
+key type :
+
+  string: binary safe: 
+    not only characters but you can store binary/byte representation.
+in general key is string.
+
+value type:
+ »»Strings
+ »»Lists
+ »»Sets
+ »»Sorted sets
+ »»Hashes
+ »»Bit arrays
+ »»Streams
+ »»HyperLogLogs
+
+Syntax
+  key value 
+
+  Note: redis has no Explicit type.
+
+ How to represent type of a value.
+
+  -> based on input(data)
+       string and numbers
+       hello    1
+
+ ->via command
+    rpush value
+         It stores data inside List data structure
+
+ how to send /get  Data?
+  
+   commands: 
+     commands are classified based on data type.
+....................................***************........................................
+
+How do i send command?
+
+ Via Client Programms.
+
+Redis offers a client program called "redis-cli" through which you can send commands.
+
+Redis architecture defines client-server paradigm.
+     Redis uses request-reponse model.
+
+  In web env
+   Client(browser)---send request----------->webserver
+                  <-------response-----------
+                      using HTTP Channel
+  In redis
+   Redis client ----send request(set of commands) ----Redis server
+		<--------response(Reply)-------------
+			Using TCP/IP protocal
+
+
+  Redis clients:
+   Redis has been extended with various programming languages
+  Java,Javascript,python,c++,C#,go......
+
+  Every programming lanugage offers "Drivers" to connect redis
+ 
+			
+............................................................................................
+
+Strings
+
+1.Redis Strings are binary safe, this means that a Redis string can contain any kind of data, for instance a JPEG image or a serialized Ruby/JSON object.
+2.A String value can be at max 512 Megabytes in length
+3.String is collection of bits :
+   
+
+ "Internally string is array of bits:Byte array".
+
+
+String sub types: String can be used to represent other types
+
+1.number : integer
+2.decimals : floats
+
+String commands:
+
+ set command
+ get command
+
+String apis(commands)
+
+1.set,get
+2.append
+3.strlen
+3.getrange
+4.setrange
+
+Numerical Values:
+
+1.incr
+2.incrby
+3.decr
+4.decrby
+5.incrbyfloat
+
+BitMaps
+ setbit
+............................................................................................
+
+Client programs:
+
+Javascript : Node.js
+
+ >install nodejs
+
+ >sudo apt-get install nodejs
+
+ >sudo apt-get install npm
+
+Source code:
+
+ 1.Download tar ball
+ 2.extract tar ball
+ 3.Add in env variable
+
+
+install VS Code:
+..............
+
+ >node --version
+
+node is javascript runtime
+npm - node package manager
+   ->javascript pacakge manager
+
+-grab js libs and push js libs into repo server npmjs.com
+
+package managers
+
+->install redis package by using npm
+
+
+index.js
+var redis=require('redis')
+var client =redis.createClient()
+
+client.on('error',function(err){
+    console.log(err);
+});
+
+client.set("message","Hello Redis",redis.print);
+
+client.get("message",function(err,response){
+    if(err) throw err;
+    console.log("Got : ", response);
+});
+
+client.quit();
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+Scripting:Looks like PLSQL In rdbms
+
+Lua Scripting language
+
+redis has extended lua language runtime(engine) as a module, integrated with redis distribution.
+
+How to write lua scripting and excute
+
+
+steps:
+
+ 1.select any working folder
+    lua-scripts
+ 2.cd lua-scripts
+
+ 3.create file 
+     filename.lua
+
+
+apis:
+
+  redis.call and redis.pcall
+    |              |
+ blocking api    non-blocking
+
+Golbal variables
+
+     KEYS[1] -x
+     ARGV[1] -10
+
+
+How to run lua script?
+
+  redis-cli --eval  path/hello.lua key1 key2 ,key1-value,key2-value
+
+...........................................................................................
+
+ Replication:
+
+    Replication means that while you write to a Redis instance (usually referred to as the
+master), it will ensure that one or more instances (usually referred to as the slaves)
+become exact copies of the master.
+
+    Clone of the Process:
+			->Replication
+    Copy of the Process :
+
+   At Operating system level clone(replica) is created by "Forking" the process.
+
+   The Orginal Process is called : Master
+   Cloned Process is called : Slave
+
+ Redis Replication works based on "copying data from Master node(instance)" to Child(slave)
+ node Peridically.
+
+  Redis uses "copy-on-write algorthim":  pure function: lambda calculs.
+
+
+"Redis 2.8 introduced asynchronous replication, which makes slaves periodically
+acknowledge the amount of data to be processed. As you would expect, a master
+can have multiple slaves and slaves can also accept connections from other slaves.
+
+ 
+
+  Mode of replication:
+  1.sync
+     client----writes data --master ---replication starts---slave 
+       while replication master is blocked, if master blocked, client blocked.
+  2.Async
+     client----writes data --master ---replication starts---slave 
+       while replication master is never blocked, if master never blocked, client never      blocked.
+
+Note: internally master and slaves connected and communicated via TCP/IP protocal.  
+
+Lab : Setting up basic master-slave architecture.
+
+There are three ways of making a Redis server instance a slave:
+
+• Add the directive slaveof IP PORT to the configuration file and start a Redis
+server using this configuration
+
+• Use the redis-server command-line option --slaveof IP PORT
+
+• Use the command SLAVEOF IP PORT
+**********************************************&&&&&&&&&&&&&&&&&&****************************
+
+
+Why replication?  :  Improve Performance
+
+   Inside writing and reading to and from on single server
+   we can spilt one server for writing and another for reading
+
+
+
+Why replication?  :  scalability
+
+                              
+    Replicas are widely used for scalability purposes so that all read operations are
+handled by replicas and the master handles only write operations.
+
+Caution :
+   Data redundancy is another reason for having multiple replicas.
+
+Key Points:(best Practices)
+
+    1.Persistence can be moved to the replicas so that the master does not perform disk
+I/O operations.
+
+   "It is possible to improve data consistency guarantees by requiring a minimum
+number of replicas connected to the master server. 
+
+   "In this way, all write operations
+are only executed in the master Redis server if the minimum number of replicas
+are satisfied, along with their maximum replication lag (in seconds)."
+
+ 
+Fail-over and Replicas:
+.....................
+
+      Replicas are very useful in a master failure scenario because they contain all of
+the most recent data and can be promoted to master
+
+
+Redis can be executed in single instance mode by default.
+
+
+Unfortunately, when Redis is running in single-instance mode, there is no automatic failover to promote a slave to master.
+
+
+How to Promote SLAVE To Master and handle failures 
+
+1.Using commands mannually
+2.Using automatic failover handling.
+	-Sentinel
+        -cluster
+
+
+All replicas and clients connected to the old master need to be reconfigured
+with the new master
+
+Lab: 
+Using commands how to promote slave to master
+
+>USING SLAVEOF NO ONE
+
+  converts a slave into a master instance, and it should be used in a failover scenario.
+
+The next example assumes there is a master on port 5555 and there are two slaves
+on ports 6666 and 7777, respectively. 
+
+If the master instance is offline (crashed or
+maintenance window), it may be required that one of its replicas become a master.
+In this situation, all connected replicas and clients need to be reconfigured.
+
+The following snippet causes a crash in the master instance (port 5555), configures
+one of the slaves to become a master, and reconfigures the second slave to replicate
+the new master:
+
+
+
+These are admin tasks
+
+$ redis-cli -p 5555 DEBUG SEGFAULT
+$ redis-cli -p 6666 SLAVEOF NO ONE
+$ redis-cli -p 7777 SLAVEOF 127.0.0.1 6666
+
+once done , test using redis-cli
+
+
+Check the new replication configuration is working:
+$ redis-cli -p 6666 SET newkey newvalue
+OK
+$ redis-cli -p 7777 GET newkey
+"newvalue"
+...............................................************...............................
+
+Partitioning:
+
+Partitioning is a general term used to describe the act of breaking up data and
+distributing it across different hosts.
+
+Types of partioning:
+ There are two types of partitioning:
+  >> horizontal partitioning 
+  >> vertical partitioning.
+
+Why?
+Partitioning is performed in a cluster of hosts when better performance, maintainability, or availability is desired.
+
+
+How to implement clustering:
+
+1.From Scratch
+   Step by Step implementation
+
+2.Byusing cluster util from redis distribution
+
+
+Replication:
+
+Replication means that while you write to a Redis instance (usually referred to as the
+master), it will ensure that one or more instances (usually referred to as the slaves)
+become exact copies of the master.
+
+Redis 2.8 introduced asynchronous replication, which makes slaves periodically
+acknowledge the amount of data to be processed. As you would expect, a master
+can have multiple slaves and slaves can also accept connections from other slaves.
+
+
+There are three ways of making a Redis server instance a slave:
+• Add the directive slaveof IP PORT to the configuration file and start a Redis
+server using this configuration
+• Use the redis-server command-line option --slaveof IP PORT
+• Use the command SLAVEOF IP PORT
+
+
+
+Steps:
+The following example starts three Redis instances: one master and two replicas.
+
+On the first terminal, start the master redis-server on port 5555:
+
+$ redis-server --port 5555
+  On the second terminal, start the first slave on port 6666:
+
+$ redis-server --port 6666 --slaveof 127.0.0.1 5555
+
+On the third terminal, start the second slave on port 7777:
+$ redis-server --port 7777 --slaveof 127.0.0.1 5555
+At this point, there is a master with two replicas running.
+
+On the fourth terminal, check whether the replication is working:
+$ redis-cli -p 5555 SET testkey testvalue
+OK
+$ redis-cli -p 6666 GET testkey
+"testvalue"
+$ redis-cli -p 7777 GET testkey
+"testvalue"
+
+
+Why replication?
+Replicas are widely used for scalability purposes so that all read operations are
+handled by replicas and the master handles only write operations.
+
+Caution
+Data redundancy is another reason for having multiple replicas.
+
+Persistence can be moved to the replicas so that the master does not perform disk
+I/O operations.
+
+It is possible to improve data consistency guarantees by requiring a minimum
+number of replicas connected to the master server. In this way, all write operations
+are only executed in the master Redis server if the minimum number of replicas
+are satisfied, along with their maximum replication lag (in seconds).
+
+
+Fail-over and Replicas:
+.....................
+
+Replicas are very useful in a master failure scenario because they contain all of
+the most recent data and can be promoted to master
+
+
+Redis can be executed in single instance mode by default.
+
+
+Unfortunately, when Redis is running in single-instance mode, there is no automatic failover to promote a slave to master.
+	
+How to Promote SLAVE To Master
+
+1.Using commands mannually
+2.Using automatic failover handling.
+	-Sentinel
+        -cluster
+
+
+All replicas and clients connected to the old master need to be reconfigured
+with the new master
+
+Lab: 
+Using commands how to promote slave to master
+
+>USING SLAVEOF NO ONE
+
+converts a slave into a master instance, and it should be used in a failover scenario.
+
+
+Eg;
+The next example assumes there is a master on port 5555 and there are two slaves
+on ports 6666 and 7777, respectively. If the master instance is offline (crashed or
+maintenance window), it may be required that one of its replicas become a master.
+In this situation, all connected replicas and clients need to be reconfigured.
+
+The following snippet causes a crash in the master instance (port 5555), configures
+one of the slaves to become a master, and reconfigures the second slave to replicate
+the new master:
+
+These are admin tasks
+
+$ redis-cli -p 5555 DEBUG SEGFAULT
+$ redis-cli -p 6666 SLAVEOF NO ONE
+$ redis-cli -p 7777 SLAVEOF 127.0.0.1 6666
+
+once done , test using redis-cli
+
+
+
+Check the new replication configuration is working:
+$ redis-cli -p 6666 SET newkey newvalue
+OK
+$ redis-cli -p 7777 GET newkey
+"newvalue"
+
+..........................*********...............................................
+Partitioning:
+
+Partitioning is a general term used to describe the act of breaking up data and
+distributing it across different hosts.
+
+Types of partioning:
+ There are two types of partitioning:
+  >> horizontal partitioning 
+  >> vertical partitioning.
+Why?
+Partitioning is performed in a cluster of hosts when better performance, maintainability, or availability is desired.
+
+When Redis was initially designed, it had no intention to be a distributed data store;
+thus, it cannot natively distribute its data among different instances. It was designed
+to work well on a single server. Redis Cluster is designed to solve distributed problems
+in Redis.
+
+Over time, Redis storage may grow to such an extent that a single server may not
+be enough to store all of the data. The performance of reading from and writing to
+a single server may also decline.
+
+As we saw in the previous section, we can use replicas to optimize reads and remove
+some bottlenecks from the master instance, but in many cases, this is not enough.
+Different needs require different approaches, and here are some situations that we
+did not provide information on how to handle yet:
+
+• The total data to be stored is larger than the total memory available in a
+Redis server
+• The network bandwidth is not enough to handle all of the traffic
+
+ We will show some solutions to the problems listed in the preceding list using
+the concept of partitioning
+
+Partitioning Implementations:
+............................
+
+1.Client side
+
+   Where,single-instance mode and  Redis does not support partitioning
+  or clustering
+
+2.Server side 
+   Using a proxy or a query routing system
+        -Clustering
+
+
+>> horizontal partitioning :  
+  Horizontal partitioning means  distributing keys across different Redis instances.
+
+For example, if you have two Redis Sets stored in
+Redis, horizontal partitioning would distribute each Set entirely to a different Redis
+instance
+
+>> vertical partitioning
+  While vertical partitioning means distributing key values
+across different Redis instances
+
+ while vertical partitioning would distribute the Set's values to different
+instances.
+
+  Each kind of partitioning has its purpose.
+
+ Horizontal partitioning (also known as "sharding") is the most popular approach adopted with   Redis
+
+
+Horizontal partitioning Techniques:
+...................................
+
+Range Partitioning:
+..................
+
+Range partitioning is very simple; data is distributed based on a range of keys.
+Assuming that the keys you want to partition are based on incremental IDs, you
+can create numerical ranges to partition the data. 
+
+For example, assuming that you have a group of users identified by IDs (such as user:1, user:2, and so on up to user:5000) you can split these IDs into ranges of thousands.
+
+Then you can send keys that go from 1 to 1000 to a given instance, 1001 to 2000 to a different instance, 2001 to 3000 to another instance, and so on
+
+
+Another Eg:
+
+A different approach would be to partition the data based on the first letter of
+each key, so you would send all keys that go from A to G to one instance, H to O
+to another instance, and P to Z to a third instance. This logic would partition the
+data into three ranges, and each range would be stored in a different host
+
+    "The whole idea of range partitioning is to create ranges of keys and distribute
+them to different Redis instances. You can be creative in how you create the
+range selection."
+
+
+Drawbacks of Range Partitioning:
+
+1.A downside to this type of partitioning is that the distributions will probably be
+uneven—one range may be much larger than others. 
+ 
+For example, if you decide to
+distribute the keys based on their first letter but you do not have a good distribution
+of key names (that is, most of your keys are in the same range or some ranges have
+very few keys), you are going to end up with a very uneven distribution that does
+not take full advantage of partitioning
+
+Another downside is that this does not accommodate changing the list of Redis hosts
+easily, because if the number of Redis instances changes, the range distribution needs
+to change accordingly. It is likely that adding or removing a host will invalidate a
+good portion of data
+
+Implementation: u can write code at client side : may be js code
+
+
+Hash partitioning:
+.................
+
+Hash partitioning is a little more elaborate than range partitioning, and it does not
+have the range partitioning method's downside of uneven data partitioning
+
+Hash partitioning is very well known, and everyone who manages Memcached at scale is
+familiar with it.
+
+
+Hash partitioning is very simple to implement. It consists of finding the instance to
+send the commands by applying a hash function to the Redis key, dividing this hash
+value by the number of Redis instances available, and using the remainder of that
+division as the instance index.
+
+A JavaScript snippet may exemplify this idea better than English:
+var index = hashFunction(redisKey) % redisHosts.length;
+var host = redisHosts[index];
+
+The efficiency of this method varies with the hash function you choose. If your hash
+function is good for your dataset, it will create even partitions. It is very common for
+people to use MD5 and SHA1 as hash functions.
+
+eg:write js files
+
+Other technquies
+
+Presharding,
+
+consistent hashing,
+
+tagging
+////////////////////////////////////////////////////////////////////////////////////////////
+
+Implementations of Redis partitioning:
+.......................................
+• The client layer is the application layer, such as what we implemented in the
+previous examples.
+• The proxy layer is an extra layer that proxies all Redis queries and performs
+partitioning for applications. When a proxy is used, the client layer does not
+even need to know that partitioning is taking place.
+An example of this layer is the twemproxy program,
+
+• The query router layer is something that is invisible to the application.
+However, it is not an external program; it is the data store itself. Any
+command issued to any Redis instance will succeed with this layer, because
+the Redis instance itself will make sure that the command is routed to the
+appropriate instance in its cluster. Redis Cluster behaves like a query router
+
+
+Twemproxy : if you want you can use this, developed by twitter,and open sourced
+
+.............................................................................................
+
+Cluster:
+
+
+Introduction:
+
+Redis was initially designed to be very lightweight and fast. Previously, the only topology available for anyone using Redis was master/slave, in which the master receives all the writes and replicates the changes to the slave (or slaves). This happens without any sort of automatic failover or data sharding. This topology works well in many scenarios, such as when:
+•
+The master has enough memory to store all of the data that you need
+•
+More slaves can be added to scale reads better or when network bandwidth is a problem (the total read volume is higher than the hardware capability)
+•
+It is acceptable to stop your application when maintenance is required on the master machine
+•
+Data redundancy through slaves is enough
+
+
+But it does not work well in other scenarios, such as when:
+•The dataset is bigger than the available memory in the master Redis instance
+•A given application cannot be stopped when there are issues with the
+master instance
+•You need to distribute data among multiple nodes
+•A single point of failure is not acceptable
+
+
+History:
+
+ In 2011, Salvatore Sanfilippo started working on a project that would solve these
+problems, but Redis was still underdeveloped. He decided to stop his work because
+of requests from the community to support other features, such as persistence, better
+data types, introspection, and replication. In 2011, he did not have a lot of knowledge
+about distributed systems, and Redis Cluster was a complex project to create. It was
+a great idea, but it required more experience than he had at that time. Solving all of
+these problems was a difficult task, so he decided to tackle only automatic failover
+and created a project called Redis Sentinel.
+
+
+Redis-Cluster Project Vs Redis Sentinel:
+.......................................
+Redis Sentinel and Redis Cluster share a lot of characteristics, but each has its own
+goal. Sentinel's goal is to provide reliable automatic failover in a master/slave
+topology without sharding data.
+
+ Cluster's goal is to distribute data across different
+Redis instances and perform automatic failover if any problem happens to any
+master instance.
+
+Redis Sentinel became stable in Redis 2.8 in late 2013, and Redis Cluster became
+stable in Redis 3.0 in early 2015.
+
+
+
+The CAP theorem:
+................
+
+Most distributed systems are generally analyzed using the CAP theorem, which
+states that a distributed system cannot ensure all of the following:
+
+• Consistency: A read operation is guaranteed to return the most recent write
+
+• Availability: Any operation is guaranteed to receive a response saying
+whether it has succeeded or failed
+
+• Partition tolerance: The system continues to operate when a network
+partition occurs
+
+Since Redis Sentinel and Redis Cluster are distributed systems, it is fair to analyze
+them using the CAP theorem. Network partitions are unavoidable in a distributed
+system, so it should ensure either consistency or availability; that is, it should be
+either CP or AP.
+
+
+Naturally:
+
+Theoretically, Redis Sentinel and Redis Cluster are neither consistent nor available
+under network partitions. However, there are some configurations that can minimize
+the consistency and availability problems.
+
+They cannot provide availability because there is a "quorum" that needs to agree on
+a master election, and depending on the quorum's decision, part of the system may
+become unavailable.
+
+They cannot provide consistency under network partitions, for example, when two
+or more partitions accept writes at the same time. When the network heals and the
+partitions are joined, some of those writes will be lost (conflicts are not automatically
+solved, nor are they exposed for clients).
+
+
+Redis Cluster:
+Redis Cluster was designed to automatically shard data across different Redis
+instances, providing some degree of availability during network partitions.
+
+
+there aretwo ports that Redis uses.
+The first is used to serve clients (low port), and the second
+serves as a bus for node-to-node communication (high port).
+The high port is used to exchange messages such as failure detection, failover, resharding, and so on.
+
+The Redis Cluster bus uses a binary protocol to exchange messages between nodes.
+The low port is specified in the configuration, and Redis assigns the high port by
+adding 10,000 to the low port.
+
+
+For example, if a Redis server starts listening to port
+6379 (low port) in cluster mode, it will internally assign port 16379 (high port) for
+node-to-node communication.
+
+The Redis Cluster topology is a full mesh network
+
+ A mesh network (or simply meshnet) is a local network topology in which the infrastructure nodes (i.e. bridges, switches, and other infrastructure devices) connect directly, dynamically and non-hierarchically to as many other nodes as possible and cooperate with one another to efficiently route data from/to clients.
+
+All nodes are interconnected through Transmission Control Protocol (TCP) connections
+
+
+Redis Cluster requires at least three masters,It is recommended that you have at least one replica per master. Otherwise, if any 	master node without at least one replica fails, the data will be lost:
+
+when a failover is happening in Redis Cluster, only the keys
+in the slots assigned to the failed master are unavailable until a replica is promoted.
+The data may be unavailable during a failover, because slave promotion is not
+instantaneous.
+
+
+When Redis is in cluster mode, its interface is slightly changed. This requires a smarter
+client. When connecting to Redis through redis-cli, the -c parameter is required to
+enable cluster mode.
+
+Connect server in cluster mode:
+
+redis-cli -c -h localhost -p 6379
+
+Cluster and Partitioning:
+
+Hash slots:
+The partitioning method used to shard data by Redis Cluster is similar to the hash
+partitioning
+
+ In Redis Cluster, that fixed value is 16,384. Redis calls this method hash slot. 
+Each master in a cluster owns a portion of the 16,384 slots.
+
+Use the create-cluster start command to initialize six Redis instances:
+
+
+
+Steps:
+........
+
+1.create cluster
+
+redis-server --port 5000 --cluster-enabled yes --cluster-config-file
+nodes-5000.conf --cluster-node-timeout 2000 --cluster-slave-validityfactor
+10 --cluster-migration-barrier 1 --cluster-require-full-coverage
+yes --dbfilename dump-5000.rdb --daemonize no
+
+redis-server --port 5001 --cluster-enabled yes --cluster-config-file
+nodes-5001.conf --cluster-node-timeout 2000 --cluster-slave-validityfactor
+10 --cluster-migration-barrier 1 --cluster-require-full-coverage
+yes --dbfilename dump-5001.rdb --daemonize no
+
+
+redis-server --port 5002 --cluster-enabled yes --cluster-config-file
+nodes-5002.conf --cluster-node-timeout 2000 --cluster-slave-validityfactor
+10 --cluster-migration-barrier 1 --cluster-require-full-coverage
+yes --dbfilename dump-5002.rdb --daemonize no
+
+
+2.Test cluster state
+
+$ redis-cli -c -p 5000
+127.0.0.1:5000> CLUSTER INFO
+
+
+127.0.0.1:5000> CLUSTER INFO
+cluster_state:fail
+cluster_slots_assigned:0
+cluster_slots_ok:0
+cluster_slots_pfail:0
+cluster_slots_fail:0
+cluster_known_nodes:1
+cluster_size:0
+cluster_current_epoch:0
+cluster_my_epoch:0
+cluster_stats_messages_sent:0
+cluster_stats_messages_received:0
+127.0.0.1:5000> SET foo bar
+(error) CLUSTERDOWN The cluster is down
+
+
+The output of CLUSTER INFO tells us that the cluster only knows about one node
+(the connected node), no slots are assigned to any of the nodes, and the cluster state
+is fail.
+When the cluster is in the fail state, it cannot process any queries, as we could see
+when we tried to execute the SET command.
+Next, the 16,384 hash slots are distributed evenly across the three instances.
+The configuration cluster-require-full-coverage is set to yes, which means that the
+cluster can process queries only if all hash slots are assigned to running instances:
+
+$ redis-cli -c -p 5000 CLUSTER ADDSLOTS {0..5460}
+$ redis-cli -c -p 5001 CLUSTER ADDSLOTS {5461..10922}
+$ redis-cli -c -p 5002 CLUSTER ADDSLOTS {10923..16383}
+
+
+The CLUSTER ADDSLOTS command informs the node what slots it should own.
+If a hash slot is already assigned, this command fails. It is possible to assign slots one
+by one; it does not need to be a sequence of numbers.
+
+
+At this point, the hash slots are distributed evenly across the nodes, but the cluster is
+not ready yet. The cluster nodes still do not know about each other.
+In Redis Cluster, there is a concept called configuration epoch, which is a number that
+represents the cluster state at a particular point in time.
+
+
+When a cluster is initially created, the configuration epoch is set to 0 for each master.
+We can change this to help Redis start the cluster in a safe way. This is the only
+time when the configuration epoch should be changed manually. Redis Cluster
+automatically changes the configuration after it is up and running:
+
+$ redis-cli -c -p 5000 CLUSTER SET-CONFIG-EPOCH 1
+$ redis-cli -c -p 5001 CLUSTER SET-CONFIG-EPOCH 2
+$ redis-cli -c -p 5002 CLUSTER SET-CONFIG-EPOCH 3
+
+This example executes the command CLUSTER SET-CONFIG-EPOCH to manually
+set an incremental epoch to each node, which is good practice when starting a new
+cluster. In this example, there is no conflicting information. However, if there was
+conflicting information (for example, if two different nodes claimed the same hash
+slots), the largest epoch configuration would have priority.
+
+
+Next, we are going to make all the nodes aware of each other. We will do this using
+the command CLUSTER MEET:
+$ redis-cli -c -p 5000 CLUSTER MEET 127.0.0.1 5001
+$ redis-cli -c -p 5000 CLUSTER MEET 127.0.0.1 5002
+
+
+It is not necessary to execute CLUSTER MEET on each node to notify it about the
+existence of all the other nodes. When the first node meets the second, it means that
+the second node also knows about the first, and they can exchange information about
+other nodes that they know. When the first node meets the third node, all three
+nodes will know about each other eventually, through the gossip protocol that Redis
+Cluster implements.
+
+
+ " gossip protocol is a procedure or process of computer peer-to-peer communication that is based on the way epidemics spread. Some distributed systems use peer-to-peer gossip to ensure that data is disseminated to all members of a group."
+
+Run the command CLUSTER INFO to see that the cluster is up and running:
+$ redis-cli -c -p 5000
+127.0.0.1:5000> CLUSTER INFO
+cluster_state:ok
+cluster_slots_assigned:16384
+cluster_slots_ok:16384
+cluster_slots_pfail:0
+cluster_slots_fail:0
+cluster_known_nodes:3
+cluster_size:3
+cluster_current_epoch:3
+cluster_my_epoch:1
+cluster_stats_messages_sent:164
+cluster_stats_messages_received:144
+127.0.0.1:5000> SET hello world
+OK
+
+
+As you can see, CLUSTER INFO reports that the cluster state is ok, all 16,384 hash
+slots are assigned, the current configuration epoch is 3, and the cluster knows about
+three nodes.
+
+
+
+Adding slaves/replicas:
+
+There are three master nodes but no slaves. Thus, no data is replicated anywhere.
+This is not very safe. Data can be lost, and if any master has issues, the entire cluster
+will be unavailable (cluster-require-full-coverage is set to yes).
+A new slave/replica can be added to the cluster by:
+• Creating a new Redis instance in cluster mode
+• Introducing it to the current cluster using the command CLUSTER MEET
+• Getting the node ID of the master that will be replicated using the command
+CLUSTER NODES
+• Executing the command CLUSTER REPLICATE to replicate a given node
+
+
+There are three master nodes but no slaves. Thus, no data is replicated anywhere.
+This is not very safe. Data can be lost, and if any master has issues, the entire cluster
+will be unavailable (cluster-require-full-coverage is set to yes).
+
+
+
+A new slave/replica can be added to the cluster by:
+• Creating a new Redis instance in cluster mode
+• Introducing it to the current cluster using the command CLUSTER MEET
+• Getting the node ID of the master that will be replicated using the command
+CLUSTER NODES
+• Executing the command CLUSTER REPLICATE to replicate a given node
+
+
+Create a new Redis instance in cluster mode:
+
+
+$ redis-server --port 5003 --cluster-enabled yes --cluster-config-file
+nodes-5003.conf --cluster-node-timeout 2000 --cluster-slave-validityfactor
+10 --cluster-migration-barrier 1 --cluster-require-full-coverage
+yes --dbfilename dump-5003.rdb --daemonize yes
+
+
+Introduce it to the current cluster using the command CLUSTER MEET:
+$ redis-cli -c -p 5003 CLUSTER MEET 127.0.0.1 5000
+Get the node ID of the master that is going to be replicated by using the command
+
+
+CLUSTER NODES:
+$ redis-cli -c -p 5003 CLUSTER NODES
+
+b5354de29d7ec02e64580658d3f59422cfeda916 127.0.0.1:5002 master - 0
+1432276450590 3 connected 10923-16383
+08cbbb4c05ec977af9c4925834a71971bbea3477 127.0.0.1:5003 myself,master - 0
+0 0 connected
+68af8b5f533abae1888312a2fecd7cbe4ac77e0a 127.0.0.1:5001 master - 0
+1432276449782 2 connected 5461-10922
+f5940c6bcd6f06abb07f7d480b16630b6a597424 127.0.0.1:5000 master - 0
+1432276449782 1 connected 0-5460
+
+The command CLUSTER NODES outputs a list with all the nodes that belong to
+the cluster, along with their properties. Every line follows this format: <node-id>
+<ip:port> <flags> <master> <ping-sent> <pong-recv> <config-epoch> <link-state> <slots>.
+
+
+Let's replicate the instance running on port 5000. The output shows that the node ID
+for this instance is f5940c6bcd6f06abb07f7d480b16630b6a597424.
+
+Since the node ID is generated randomly using /dev/urandom, all CLUSTER NODES
+outputs in our examples are merely for demonstration.
+
+Execute the command CLUSTER REPLICATE to replicate a given node:
+$ redis-cli -c -p 5003 CLUSTER REPLICATE
+f5940c6bcd6f06abb07f7d480b16630b6a597424
+
+
+The replica is ready and CLUSTER NODES can confirm this:
+
+$ redis-cli -c -p 5003 CLUSTER NODES
+
+b5354de29d7ec02e64580658d3f59422cfeda916 127.0.0.1:5002 master - 0
+1432276452608 3 connected 10923-16383
+08cbbb4c05ec977af9c4925834a71971bbea3477 127.0.0.1:5003 myself,slave
+f5940c6bcd6f06abb07f7d480b16630b6a597424 0 0 0 connected
+68af8b5f533abae1888312a2fecd7cbe4ac77e0a 127.0.0.1:5001 master - 0
+1432276452608 2 connected 5461-10922
+f5940c6bcd6f06abb07f7d480b16630b6a597424 127.0.0.1:5000 master - 0
+1432276451800 1 connected 0-5460
+
+The first output line is the slave information. It said myself,master previously, and
+after CLUSTER REPLICATE, it became myself,slave.
+
+
+
+
+
+
+
+ 
